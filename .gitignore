@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+
+# Stage 6D generated tables (keep directory via .gitkeep)
+artifacts/tables/*
+!artifacts/tables/.gitkeep
+artifacts/performance/*
+!artifacts/performance/.gitkeep
