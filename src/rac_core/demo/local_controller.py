@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from rac_core.adapter import EventAdapter, EventConstructionError
+from rac_core.checker.action_lattice import ActionLattice, DEFAULT_ACTION_LATTICE
 from rac_core.checker import RACPreCommitChecker
 from rac_core.models import (
     Decision,
@@ -81,9 +82,13 @@ class LocalRACController:
             lineage_store=self.lineage_store,
         )
         self.output_verifier = OutputAnchorVerifier(self.resource_registry)
+        lat = {k: set(v) for k, v in DEFAULT_ACTION_LATTICE.items()}
+        # Demo adapter evidence: allow read of freshly created local files in same session.
+        lat["write"] |= {"write", "read"}
         self.checker = RACPreCommitChecker(
             lineage_store=self.lineage_store,
             basis_store=self.basis_store,
+            action_lattice=ActionLattice(lattice=lat),
         )
 
     def run_scenario(self, scenario_name: str) -> DemoRunResult:
@@ -290,20 +295,30 @@ class LocalRACController:
         last_verified_anchor,
     ) -> RuntimeTraceContext:
         input_anchors: list[InputAnchorRef] = []
-        if call.tool_name == "summarize_file":
+        if call.tool_name in {"summarize_file", "read_file"}:
             raw = call.arguments.get("input_anchor")
-            if raw == "out:fake":
+            if raw == "out:fake" and call.tool_name == "summarize_file":
                 input_anchors = [InputAnchorRef(anchor_id="out:fake")]
             elif raw == "previous" or raw is None:
                 if last_verified_anchor is None:
-                    raise EventConstructionError(
-                        "summarize_file requires a verified predecessor anchor."
-                    ) from None
+                    if call.tool_name == "summarize_file":
+                        raise EventConstructionError(
+                            "summarize_file requires a verified predecessor anchor."
+                        ) from None
+                else:
+                    input_anchors = [
+                        InputAnchorRef(
+                            anchor_id=last_verified_anchor.anchor_id,
+                            producer_event_id=last_verified_anchor.producer_event_id,
+                            content_hash=last_verified_anchor.content_hash,
+                        )
+                    ]
+            elif raw not in (None, "previous"):
                 input_anchors = [
                     InputAnchorRef(
-                        anchor_id=last_verified_anchor.anchor_id,
-                        producer_event_id=last_verified_anchor.producer_event_id,
-                        content_hash=last_verified_anchor.content_hash,
+                        anchor_id=str(raw),
+                        producer_event_id=None,
+                        content_hash=None,
                     )
                 ]
 
@@ -363,6 +378,17 @@ class LocalRACController:
     ):
         if call.tool_name == "read_file":
             return self.tool_runtime.read_file(str(call.arguments["file_id"]), event_id)
+        if call.tool_name == "search_documents":
+            return self.tool_runtime.search_documents(str(call.arguments["query"]), event_id)
+        if call.tool_name == "create_file":
+            file_path = str(call.arguments["file_path"])
+            content = str(call.arguments.get("content", ""))
+            # Register created resources before anchor verification to keep registry consistent.
+            if not self.resource_registry.contains(file_path):
+                self.resource_registry.register(
+                    ResourceMetadata(resource_id=file_path, resource_type="file")
+                )
+            return self.tool_runtime.create_file(file_path, content, event_id)
         if call.tool_name == "summarize_file":
             if last_verified_anchor is None or last_actual_output is None:
                 raise ValueError("summarize_file requires a prior verified step output.")
@@ -397,7 +423,7 @@ def _block_decision(rule: str, reason: str) -> Decision:
 
 def _build_demo_resource_registry() -> InMemoryResourceRegistry:
     reg = InMemoryResourceRegistry()
-    for rid in ("file_A", "file_B"):
+    for rid in ("file_A", "file_B", "file_C", "new_file"):
         reg.register(ResourceMetadata(resource_id=rid, resource_type="file"))
     for rid in ("external@example.com", "internal@example.com"):
         reg.register(ResourceMetadata(resource_id=rid, resource_type="external_channel"))

@@ -100,3 +100,10 @@ class TraceRunner:
             step_results=step_results,
             blocked_at_step=blocked_at_step,
         )
+
+
+def build_taxonomy_traces() -> list[ControlledTrace]:
+    """Return 40+ drift taxonomy controlled traces (see :mod:`rac_core.validation.taxonomy_traces`)."""
+    from .taxonomy_traces import build_taxonomy_traces_list
+
+    return build_taxonomy_traces_list()

@@ -1,0 +1,1 @@
+Delegate file_A summary to agent_sub then return result.

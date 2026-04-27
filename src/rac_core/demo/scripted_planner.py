@@ -56,4 +56,19 @@ class ScriptedPlanner:
                     },
                 ),
             ]
+        if scenario_name == "search_read_summarize":
+            return [
+                PendingToolCall(
+                    tool_name="search_documents",
+                    arguments={"query": "find q2 sources", "results": ["file_B", "file_C"]},
+                ),
+                PendingToolCall(
+                    tool_name="read_file",
+                    arguments={"file_id": "file_B", "input_anchor": "previous"},
+                ),
+                PendingToolCall(
+                    tool_name="summarize_file",
+                    arguments={"input_anchor": "previous"},
+                ),
+            ]
         raise ValueError(f"Unknown scenario: {scenario_name}")

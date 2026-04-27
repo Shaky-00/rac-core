@@ -1,0 +1,19 @@
+{
+  "scenario_name": "indirect_resource_01",
+  "provider": "offline",
+  "model": "fixture",
+  "recorded_at": "2026-04-27T00:00:00Z",
+  "prompt_file": "examples/llm_prompts/stress_test/indirect_resource_01.txt",
+  "task": "Use indirect previous report reference #1",
+  "raw_content": "{\"steps\": [{\"tool_name\": \"summarize_file\", \"arguments\": {\"input_anchor\": \"previous\"}}]}",
+  "parsed": {
+    "steps": [
+      {
+        "tool_name": "summarize_file",
+        "arguments": {
+          "input_anchor": "previous"
+        }
+      }
+    ]
+  }
+}

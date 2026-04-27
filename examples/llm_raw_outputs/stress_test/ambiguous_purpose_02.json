@@ -1,0 +1,20 @@
+{
+  "scenario_name": "ambiguous_purpose_02",
+  "provider": "offline",
+  "model": "fixture",
+  "recorded_at": "2026-04-27T00:00:00Z",
+  "prompt_file": "examples/llm_prompts/stress_test/ambiguous_purpose_02.txt",
+  "task": "Use unknown tool with unclear purpose.",
+  "raw_content": "{\"steps\": [{\"tool_name\": \"analyze_file\", \"arguments\": {\"file_id\": \"file_A\", \"selected_purpose\": \"analysis\"}}]}",
+  "parsed": {
+    "steps": [
+      {
+        "tool_name": "analyze_file",
+        "arguments": {
+          "file_id": "file_A",
+          "selected_purpose": "analysis"
+        }
+      }
+    ]
+  }
+}

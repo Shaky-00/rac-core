@@ -25,6 +25,7 @@ _RULE_ABBREV: dict[str, str] = {
     "SESSION_MISMATCH": "SESS",
     "BASIS_NOT_FOUND": "BASIS",
     "BASIS_EMPTY_AFTER_UPDATE": "EMPTY",
+    "OUTPUT_ANCHOR_INVALID": "ANCH",
 }
 
 
@@ -127,6 +128,96 @@ def format_ablation_cell(step_result: AblationStepResult) -> str:
             return f"B({abbreviate_rule(step_result.observed_rules[0])})"
         return "B"
     return format_decision_short(obs)
+
+
+class ComponentAblationMatrixRow(BaseModel):
+    """Per-case RAC vs component ablation modes (B=block, M=miss/allow drift, A=allow)."""
+
+    case: str
+    full: str
+    wo_origin: str
+    wo_lineage: str
+    wo_purpose: str
+    wo_action: str
+    wo_conditions: str
+    wo_delegation: str
+    wo_anchor: str
+
+
+_COMPONENT_MATRIX_FIELDS: tuple[tuple[AblationMode, str], ...] = (
+    (AblationMode.FULL_RAC, "full"),
+    (AblationMode.RAC_WITHOUT_RESOURCE_ORIGIN, "wo_origin"),
+    (AblationMode.RAC_WITHOUT_LINEAGE, "wo_lineage"),
+    (AblationMode.RAC_WITHOUT_PURPOSE, "wo_purpose"),
+    (AblationMode.RAC_WITHOUT_ACTION, "wo_action"),
+    (AblationMode.RAC_WITHOUT_CONDITIONS, "wo_conditions"),
+    (AblationMode.RAC_WITHOUT_DELEGATION, "wo_delegation"),
+    (AblationMode.RAC_WITHOUT_ANCHOR, "wo_anchor"),
+)
+
+
+def format_component_ablation_matrix_cell(
+    *,
+    step_result: AblationStepResult,
+    is_benign: bool,
+    miss_mode_value: str | None,
+    mode: AblationMode,
+) -> str:
+    obs = step_result.observed_decision
+    if is_benign:
+        return "A" if obs == DecisionType.ALLOW else "B"
+    if obs == DecisionType.BLOCK:
+        return "B"
+    if obs == DecisionType.ALLOW:
+        if miss_mode_value is not None and mode.value == miss_mode_value:
+            return "M"
+        return "FN"
+    return format_decision_short(obs)
+
+
+def build_component_ablation_matrix_rows(
+    results: list[AblationTraceResult],
+    *,
+    trace_order: list[str],
+    trace_labels: dict[str, str] | None = None,
+    miss_mode_by_trace: dict[str, str | None] | None = None,
+    benign_trace_names: set[str] | None = None,
+) -> list[ComponentAblationMatrixRow]:
+    """Pivot ablation suite results into a component × mode matrix (last step per trace/mode)."""
+    by_trace: dict[str, dict[AblationMode, AblationTraceResult]] = {}
+    for r in results:
+        by_trace.setdefault(r.trace_name, {})[r.mode] = r
+
+    labels = trace_labels or {}
+    miss_map = miss_mode_by_trace or {}
+    benign = benign_trace_names or set()
+
+    def last_step(trace_name: str, mode: AblationMode) -> AblationStepResult | None:
+        tr = by_trace.get(trace_name, {}).get(mode)
+        if tr is None or not tr.step_results:
+            return None
+        return tr.step_results[-1]
+
+    rows: list[ComponentAblationMatrixRow] = []
+    for tn in trace_order:
+        display = labels.get(tn, tn)
+        is_benign = tn in benign
+        miss_v = miss_map.get(tn)
+        cells: dict[str, str] = {}
+        for mode, field in _COMPONENT_MATRIX_FIELDS:
+            sr = last_step(tn, mode)
+            cells[field] = (
+                "—"
+                if sr is None
+                else format_component_ablation_matrix_cell(
+                    step_result=sr,
+                    is_benign=is_benign,
+                    miss_mode_value=miss_v,
+                    mode=mode,
+                )
+            )
+        rows.append(ComponentAblationMatrixRow(case=display, **cells))
+    return rows
 
 
 def build_ablation_matrix_rows(

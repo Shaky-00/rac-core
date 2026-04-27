@@ -21,9 +21,20 @@ class BasisTightener:
         self,
         action_lattice: ActionLattice | None = None,
         condition_tightener: ConditionTightener | None = None,
+        *,
+        skip_purpose_intersection: bool = False,
+        skip_action_lattice: bool = False,
+        skip_delegation_checks: bool = False,
+        skip_condition_checks: bool = False,
+        skip_resource_intersection: bool = False,
     ) -> None:
         self.action_lattice = action_lattice or ActionLattice()
         self.condition_tightener = condition_tightener or ConditionTightener()
+        self.skip_purpose_intersection = skip_purpose_intersection
+        self.skip_action_lattice = skip_action_lattice
+        self.skip_delegation_checks = skip_delegation_checks
+        self.skip_condition_checks = skip_condition_checks
+        self.skip_resource_intersection = skip_resource_intersection
 
     def tighten_basis(
         self,
@@ -41,9 +52,14 @@ class BasisTightener:
                 reason="event resource type does not match inherited basis resource type",
             )
 
-        new_resource_ids = set(inherited_basis.resource_scope.ids).intersection(
-            event.resource_scope.ids
-        )
+        if self.skip_resource_intersection:
+            new_resource_ids = set(inherited_basis.resource_scope.ids) | set(
+                event.resource_scope.ids
+            )
+        else:
+            new_resource_ids = set(inherited_basis.resource_scope.ids).intersection(
+                event.resource_scope.ids
+            )
         if not new_resource_ids:
             return BasisTighteningResult(
                 valid=False,
@@ -51,7 +67,10 @@ class BasisTightener:
                 reason="resource scope becomes empty after tightening",
             )
 
-        new_purpose_scope = set(inherited_basis.purpose_scope).intersection({event.purpose})
+        if self.skip_purpose_intersection:
+            new_purpose_scope = set(inherited_basis.purpose_scope) | {event.purpose}
+        else:
+            new_purpose_scope = set(inherited_basis.purpose_scope).intersection({event.purpose})
         if not new_purpose_scope:
             return BasisTighteningResult(
                 valid=False,
@@ -68,15 +87,18 @@ class BasisTightener:
             )
         new_subjects = {event_subject}
 
-        if not self.action_lattice.is_action_allowed(event.action, inherited_basis.actions):
-            return BasisTighteningResult(
-                valid=False,
-                rule="ACTION_ESCALATION",
-                reason="event action is not allowed by inherited actions",
+        if not self.skip_action_lattice:
+            if not self.action_lattice.is_action_allowed(event.action, inherited_basis.actions):
+                return BasisTighteningResult(
+                    valid=False,
+                    rule="ACTION_ESCALATION",
+                    reason="event action is not allowed by inherited actions",
+                )
+            new_actions = set(inherited_basis.actions).intersection(
+                self.action_lattice.downstream_allowed_actions(event.action)
             )
-        new_actions = set(inherited_basis.actions).intersection(
-            self.action_lattice.downstream_allowed_actions(event.action)
-        )
+        else:
+            new_actions = set(inherited_basis.actions)
         if not new_actions:
             return BasisTighteningResult(
                 valid=False,
@@ -84,36 +106,40 @@ class BasisTightener:
                 reason="action scope becomes empty after tightening",
             )
 
-        try:
-            new_conditions = self.condition_tightener.tighten_conditions(
-                event.conditions, inherited_basis.conditions
-            )
-        except ValueError as exc:
-            return BasisTighteningResult(
-                valid=False,
-                rule="CONDITION_WEAKENING",
-                reason=str(exc),
-            )
+        if self.skip_condition_checks:
+            new_conditions = inherited_basis.conditions
+        else:
+            try:
+                new_conditions = self.condition_tightener.tighten_conditions(
+                    event.conditions, inherited_basis.conditions
+                )
+            except ValueError as exc:
+                return BasisTighteningResult(
+                    valid=False,
+                    rule="CONDITION_WEAKENING",
+                    reason=str(exc),
+                )
 
-        if (
-            not inherited_basis.delegation.allow_delegation
-            and event.delegation.delegated
-        ):
-            return BasisTighteningResult(
-                valid=False,
-                rule="DELEGATION_AMPLIFICATION",
-                reason="delegation introduced while inherited basis disallows delegation",
-            )
-        if (
-            event.delegation.delegated
-            and inherited_basis.delegation.allowed_delegatees
-        ):
-            if event.delegation.delegatee not in inherited_basis.delegation.allowed_delegatees:
+        if not self.skip_delegation_checks:
+            if (
+                not inherited_basis.delegation.allow_delegation
+                and event.delegation.delegated
+            ):
                 return BasisTighteningResult(
                     valid=False,
                     rule="DELEGATION_AMPLIFICATION",
-                    reason="delegatee not in inherited allowed_delegatees",
+                    reason="delegation introduced while inherited basis disallows delegation",
                 )
+            if (
+                event.delegation.delegated
+                and inherited_basis.delegation.allowed_delegatees
+            ):
+                if event.delegation.delegatee not in inherited_basis.delegation.allowed_delegatees:
+                    return BasisTighteningResult(
+                        valid=False,
+                        rule="DELEGATION_AMPLIFICATION",
+                        reason="delegatee not in inherited allowed_delegatees",
+                    )
 
         new_origin_anchors = set(inherited_basis.origin_anchors).union(
             {anchor.anchor_id for anchor in event.input_anchors}

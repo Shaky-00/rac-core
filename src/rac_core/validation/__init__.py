@@ -1,12 +1,15 @@
 from .reporting import (
     AblationMatrixRow,
     AblationSummaryRow,
+    ComponentAblationMatrixRow,
     TraceValidationRow,
     abbreviate_rule,
     build_ablation_matrix_rows,
     build_ablation_summary_rows,
+    build_component_ablation_matrix_rows,
     build_trace_validation_rows,
     format_ablation_cell,
+    format_component_ablation_matrix_cell,
     format_decision,
     format_decision_short,
     rows_to_dicts,
@@ -16,29 +19,36 @@ from .reporting import (
     to_markdown_table,
 )
 from .ablation import (
+    COMPONENT_ABLATION_MODES,
     AblationMode,
     AblationRunner,
     AblationStepResult,
     AblationSummary,
     AblationTraceResult,
 )
+from .benign_fp_traces import build_benign_fp_checker, build_benign_fp_traces
+from .component_ablation_cases import build_component_ablation_cases, component_attack_checker_factory
 from .trace import (
     ControlledTrace,
     ControlledTraceResult,
     TraceRunner,
     TraceStep,
     TraceStepResult,
+    build_taxonomy_traces,
 )
 
 __all__ = [
     "AblationMatrixRow",
     "AblationSummaryRow",
+    "ComponentAblationMatrixRow",
     "TraceValidationRow",
     "abbreviate_rule",
     "build_ablation_matrix_rows",
     "build_ablation_summary_rows",
+    "build_component_ablation_matrix_rows",
     "build_trace_validation_rows",
     "format_ablation_cell",
+    "format_component_ablation_matrix_cell",
     "format_decision",
     "format_decision_short",
     "rows_to_dicts",
@@ -46,14 +56,20 @@ __all__ = [
     "to_json",
     "to_latex_tabular",
     "to_markdown_table",
+    "COMPONENT_ABLATION_MODES",
     "AblationMode",
     "AblationRunner",
     "AblationStepResult",
     "AblationSummary",
     "AblationTraceResult",
+    "build_benign_fp_checker",
+    "build_benign_fp_traces",
+    "build_component_ablation_cases",
+    "component_attack_checker_factory",
     "TraceStep",
     "TraceStepResult",
     "ControlledTrace",
     "ControlledTraceResult",
     "TraceRunner",
+    "build_taxonomy_traces",
 ]

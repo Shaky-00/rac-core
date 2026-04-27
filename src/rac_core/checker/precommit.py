@@ -27,6 +27,9 @@ class RACPreCommitChecker:
         action_lattice: ActionLattice | None = None,
         condition_tightener: ConditionTightener | None = None,
         basis_tightener: BasisTightener | None = None,
+        *,
+        skipped_consistency_rules: frozenset[str] | None = None,
+        require_verified_output_anchor: bool = False,
     ) -> None:
         self.lineage_store = lineage_store
         self.basis_store = basis_store
@@ -39,6 +42,10 @@ class RACPreCommitChecker:
             action_lattice=self.action_lattice,
             condition_tightener=self.condition_tightener,
         )
+        self.skipped_consistency_rules = (
+            skipped_consistency_rules if skipped_consistency_rules is not None else frozenset()
+        )
+        self.require_verified_output_anchor = require_verified_output_anchor
 
     def check(
         self,
@@ -62,6 +69,13 @@ class RACPreCommitChecker:
 
         if event.session_id != grant_envelope.session_id:
             return self._block("SESSION_MISMATCH", "event session_id does not match grant")
+
+        if self.require_verified_output_anchor and output_anchor is not None:
+            if not output_anchor.verified_by_controller:
+                return self._block(
+                    "OUTPUT_ANCHOR_INVALID",
+                    "Structured output anchor is not controller-verified.",
+                )
 
         predecessor = self.lineage_store.resolve_predecessor(
             event.input_anchors,
@@ -167,81 +181,89 @@ class RACPreCommitChecker:
         self, event: TypedAuthorizationEvent, inherited_basis: AuthorizationBasis
     ) -> list[Violation]:
         violations: list[Violation] = []
+        skip = self.skipped_consistency_rules
 
         event_subject = event.subject.effective_subject or event.subject.user_id
-        if inherited_basis.subjects and event_subject not in inherited_basis.subjects:
-            violations.append(
-                Violation(
-                    rule="SUBJECT_INCONSISTENCY",
-                    reason="event subject not covered by inherited basis",
-                )
-            )
-
-        if not self.action_lattice.is_action_allowed(event.action, inherited_basis.actions):
-            violations.append(
-                Violation(
-                    rule="ACTION_ESCALATION",
-                    reason="event action is more permissive than inherited basis",
-                )
-            )
-
-        if not set(event.resource_scope.ids).issubset(inherited_basis.resource_scope.ids):
-            violations.append(
-                Violation(
-                    rule="RESOURCE_EXPANSION",
-                    reason="event resources are not contained in inherited basis",
-                )
-            )
-        if (
-            inherited_basis.resource_scope.type
-            and event.resource_scope.type != inherited_basis.resource_scope.type
-        ):
-            violations.append(
-                Violation(
-                    rule="RESOURCE_EXPANSION",
-                    reason="event resource type does not match inherited basis resource type",
-                )
-            )
-
-        if event.purpose not in inherited_basis.purpose_scope:
-            violations.append(
-                Violation(
-                    rule="PURPOSE_DRIFT",
-                    reason="event purpose is not in inherited purpose_scope",
-                )
-            )
-
-        if (
-            not inherited_basis.delegation.allow_delegation
-            and event.delegation.delegated
-        ):
-            violations.append(
-                Violation(
-                    rule="DELEGATION_AMPLIFICATION",
-                    reason="delegation introduced while inherited basis disallows it",
-                )
-            )
-        if (
-            event.delegation.delegated
-            and inherited_basis.delegation.allowed_delegatees
-        ):
-            if event.delegation.delegatee not in inherited_basis.delegation.allowed_delegatees:
+        if "SUBJECT_INCONSISTENCY" not in skip:
+            if inherited_basis.subjects and event_subject not in inherited_basis.subjects:
                 violations.append(
                     Violation(
-                        rule="DELEGATION_AMPLIFICATION",
-                        reason="delegatee not in inherited allowed_delegatees",
+                        rule="SUBJECT_INCONSISTENCY",
+                        reason="event subject not covered by inherited basis",
                     )
                 )
 
-        condition_check = self.condition_tightener.check_event_conditions(
-            event.conditions, inherited_basis.conditions
-        )
-        if not condition_check.valid:
-            violations.append(
-                Violation(
-                    rule="CONDITION_WEAKENING",
-                    reason=condition_check.reason or "event conditions violate inherited basis",
+        if "ACTION_ESCALATION" not in skip:
+            if not self.action_lattice.is_action_allowed(event.action, inherited_basis.actions):
+                violations.append(
+                    Violation(
+                        rule="ACTION_ESCALATION",
+                        reason="event action is more permissive than inherited basis",
+                    )
                 )
+
+        if "RESOURCE_EXPANSION" not in skip:
+            if not set(event.resource_scope.ids).issubset(inherited_basis.resource_scope.ids):
+                violations.append(
+                    Violation(
+                        rule="RESOURCE_EXPANSION",
+                        reason="event resources are not contained in inherited basis",
+                    )
+                )
+            if (
+                inherited_basis.resource_scope.type
+                and event.resource_scope.type != inherited_basis.resource_scope.type
+            ):
+                violations.append(
+                    Violation(
+                        rule="RESOURCE_EXPANSION",
+                        reason="event resource type does not match inherited basis resource type",
+                    )
+                )
+
+        if "PURPOSE_DRIFT" not in skip:
+            if event.purpose not in inherited_basis.purpose_scope:
+                violations.append(
+                    Violation(
+                        rule="PURPOSE_DRIFT",
+                        reason="event purpose is not in inherited purpose_scope",
+                    )
+                )
+
+        if "DELEGATION_AMPLIFICATION" not in skip:
+            if (
+                not inherited_basis.delegation.allow_delegation
+                and event.delegation.delegated
+            ):
+                violations.append(
+                    Violation(
+                        rule="DELEGATION_AMPLIFICATION",
+                        reason="delegation introduced while inherited basis disallows it",
+                    )
+                )
+            if (
+                event.delegation.delegated
+                and inherited_basis.delegation.allowed_delegatees
+            ):
+                if event.delegation.delegatee not in inherited_basis.delegation.allowed_delegatees:
+                    violations.append(
+                        Violation(
+                            rule="DELEGATION_AMPLIFICATION",
+                            reason="delegatee not in inherited allowed_delegatees",
+                        )
+                    )
+
+        if "CONDITION_WEAKENING" not in skip:
+            condition_check = self.condition_tightener.check_event_conditions(
+                event.conditions, inherited_basis.conditions
             )
+            if not condition_check.valid:
+                violations.append(
+                    Violation(
+                        rule="CONDITION_WEAKENING",
+                        reason=condition_check.reason
+                        or "event conditions violate inherited basis",
+                    )
+                )
 
         return violations

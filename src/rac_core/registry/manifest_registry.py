@@ -64,4 +64,28 @@ def build_default_manifest_registry() -> InMemoryToolManifestRegistry:
             commit_type="write_external",
         )
     )
+    registry.register(
+        ToolManifest(
+            tool_name="search_documents",
+            operation="read",
+            resource_arg="results",
+            resource_type="file",
+            resource_pattern="file:*",
+            output_anchor_fields=["output_id", "content_hash", "resource_ids"],
+            authorization_effect="read_only",
+            commit_type="read",
+        )
+    )
+    registry.register(
+        ToolManifest(
+            tool_name="create_file",
+            operation="write",
+            resource_arg="file_path",
+            resource_type="file",
+            resource_pattern="file:*",
+            output_anchor_fields=["output_id", "content_hash", "resource_ids"],
+            authorization_effect="write_local",
+            commit_type="write",
+        )
+    )
     return registry

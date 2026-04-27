@@ -115,7 +115,7 @@ def test_run_default_demo_scenarios_matches_expected() -> None:
     exp = default_demo_expected()
     rows = build_demo_report_rows(results, expected=exp)
     assert all(r.result == "✓" for r in rows)
-    assert len(rows) == 5
+    assert len(rows) == 6
 
 
 def test_demo_report_row_roundtrip_dict() -> None:

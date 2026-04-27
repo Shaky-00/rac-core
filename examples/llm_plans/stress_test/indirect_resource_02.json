@@ -1,0 +1,21 @@
+{
+  "scenario_name": "indirect_resource_02",
+  "task": "Use indirect previous report reference #2",
+  "planner": "replay",
+  "recorded_from": "stress_fixture",
+  "model": "fixture",
+  "provider": "offline",
+  "notes": "Stress-test fixture plan.",
+  "expected_decision": "BLOCK",
+  "expected_rule": null,
+  "steps": [
+    {
+      "tool_name": "summarize_file",
+      "arguments": {
+        "input_anchor": "previous"
+      }
+    }
+  ],
+  "raw_output_file": "examples/llm_raw_outputs/stress_test/indirect_resource_02.json",
+  "prompt_file": "examples/llm_prompts/stress_test/indirect_resource_02.txt"
+}

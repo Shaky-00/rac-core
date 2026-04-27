@@ -203,3 +203,13 @@ class InMemoryCausalLineageStore:
             input_anchor_ids=input_anchor_ids,
             warnings=warnings,
         )
+
+
+class RelaxedAnchorLineageStore(InMemoryCausalLineageStore):
+    """Ablation / evaluation only: allow unverified output anchors to persist."""
+
+    def append_step(self, record: CausalLineageRecord) -> None:
+        if record.output_anchor is not None and not record.output_anchor.verified_by_controller:
+            oa = record.output_anchor.model_copy(update={"verified_by_controller": True})
+            record = record.model_copy(update={"output_anchor": oa})
+        super().append_step(record)

@@ -6,6 +6,8 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 from rac_core.checker import RACPreCommitChecker
+from rac_core.checker.action_lattice import ActionLattice
+from rac_core.checker.basis_tightening import BasisTightener
 from rac_core.models import (
     Decision,
     DecisionType,
@@ -14,7 +16,10 @@ from rac_core.models import (
     VerifiedStructuredOutputAnchor,
     Violation,
 )
-from rac_core.store import InMemoryBasisStore, InMemoryCausalLineageStore
+from rac_core.store import (
+    InMemoryBasisStore,
+    InMemoryCausalLineageStore,
+)
 from rac_core.verification import (
     ResourceOriginBatchVerificationResult,
     ResourceOriginVerifier,
@@ -29,6 +34,23 @@ class AblationMode(str, Enum):
     ENTRY_ONLY_CHECK = "ENTRY_ONLY_CHECK"
     RAC_WITHOUT_LINEAGE = "RAC_WITHOUT_LINEAGE"
     RAC_WITHOUT_RESOURCE_ORIGIN = "RAC_WITHOUT_RESOURCE_ORIGIN"
+    RAC_WITHOUT_PURPOSE = "RAC_WITHOUT_PURPOSE"
+    RAC_WITHOUT_ACTION = "RAC_WITHOUT_ACTION"
+    RAC_WITHOUT_CONDITIONS = "RAC_WITHOUT_CONDITIONS"
+    RAC_WITHOUT_DELEGATION = "RAC_WITHOUT_DELEGATION"
+    RAC_WITHOUT_ANCHOR = "RAC_WITHOUT_ANCHOR"
+
+
+COMPONENT_ABLATION_MODES: tuple[AblationMode, ...] = (
+    AblationMode.FULL_RAC,
+    AblationMode.RAC_WITHOUT_RESOURCE_ORIGIN,
+    AblationMode.RAC_WITHOUT_LINEAGE,
+    AblationMode.RAC_WITHOUT_PURPOSE,
+    AblationMode.RAC_WITHOUT_ACTION,
+    AblationMode.RAC_WITHOUT_CONDITIONS,
+    AblationMode.RAC_WITHOUT_DELEGATION,
+    AblationMode.RAC_WITHOUT_ANCHOR,
+)
 
 
 class _NoOpResourceOriginVerifier(ResourceOriginVerifier):
@@ -89,10 +111,77 @@ class AblationRunner:
         if mode == AblationMode.RAC_WITHOUT_RESOURCE_ORIGIN:
             lineage_store = InMemoryCausalLineageStore()
             basis_store = InMemoryBasisStore()
+            lat = ActionLattice()
+            bt = BasisTightener(
+                action_lattice=lat,
+                skip_resource_intersection=True,
+            )
             return RACPreCommitChecker(
                 lineage_store=lineage_store,
                 basis_store=basis_store,
+                action_lattice=lat,
+                basis_tightener=bt,
                 resource_origin_verifier=_NoOpResourceOriginVerifier(),
+                skipped_consistency_rules=frozenset({"RESOURCE_EXPANSION"}),
+            )
+        if mode == AblationMode.RAC_WITHOUT_PURPOSE:
+            lat = ActionLattice()
+            bt = BasisTightener(action_lattice=lat, skip_purpose_intersection=True)
+            ls = InMemoryCausalLineageStore()
+            bs = InMemoryBasisStore()
+            return RACPreCommitChecker(
+                lineage_store=ls,
+                basis_store=bs,
+                action_lattice=lat,
+                basis_tightener=bt,
+                skipped_consistency_rules=frozenset({"PURPOSE_DRIFT"}),
+            )
+        if mode == AblationMode.RAC_WITHOUT_ACTION:
+            lat = ActionLattice()
+            bt = BasisTightener(action_lattice=lat, skip_action_lattice=True)
+            ls = InMemoryCausalLineageStore()
+            bs = InMemoryBasisStore()
+            return RACPreCommitChecker(
+                lineage_store=ls,
+                basis_store=bs,
+                action_lattice=lat,
+                basis_tightener=bt,
+                skipped_consistency_rules=frozenset({"ACTION_ESCALATION"}),
+            )
+        if mode == AblationMode.RAC_WITHOUT_CONDITIONS:
+            lat = ActionLattice()
+            bt = BasisTightener(action_lattice=lat, skip_condition_checks=True)
+            ls = InMemoryCausalLineageStore()
+            bs = InMemoryBasisStore()
+            return RACPreCommitChecker(
+                lineage_store=ls,
+                basis_store=bs,
+                action_lattice=lat,
+                basis_tightener=bt,
+                skipped_consistency_rules=frozenset({"CONDITION_WEAKENING"}),
+            )
+        if mode == AblationMode.RAC_WITHOUT_DELEGATION:
+            lat = ActionLattice()
+            bt = BasisTightener(action_lattice=lat, skip_delegation_checks=True)
+            ls = InMemoryCausalLineageStore()
+            bs = InMemoryBasisStore()
+            return RACPreCommitChecker(
+                lineage_store=ls,
+                basis_store=bs,
+                action_lattice=lat,
+                basis_tightener=bt,
+                skipped_consistency_rules=frozenset({"DELEGATION_AMPLIFICATION"}),
+            )
+        if mode == AblationMode.RAC_WITHOUT_ANCHOR:
+            ls = InMemoryCausalLineageStore()
+            bs = InMemoryBasisStore()
+            lat = ActionLattice()
+            return RACPreCommitChecker(
+                lineage_store=ls,
+                basis_store=bs,
+                action_lattice=lat,
+                basis_tightener=BasisTightener(action_lattice=lat),
+                require_verified_output_anchor=False,
             )
         return self.checker_factory()
 
@@ -190,16 +279,23 @@ class AblationRunner:
 
         assert checker is not None
         event = step.event
+        output_anchor = step.output_anchor
         if mode == AblationMode.RAC_WITHOUT_LINEAGE:
             event = step.event.model_copy(
                 update={"input_anchors": [], "advisory_predecessor_hints": []}
             )
+        if (
+            mode == AblationMode.RAC_WITHOUT_ANCHOR
+            and output_anchor is not None
+            and not output_anchor.verified_by_controller
+        ):
+            output_anchor = output_anchor.model_copy(update={"verified_by_controller": True})
 
         return checker.check(
             event=event,
             grant_envelope=step.grant,
             local_allow=step.local_allow,
-            output_anchor=step.output_anchor,
+            output_anchor=output_anchor,
             persist=step.persist,
         )
 

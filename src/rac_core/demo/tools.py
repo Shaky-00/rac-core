@@ -92,3 +92,43 @@ class LocalToolRuntime:
             observed_resource_ids=observed,
             metadata={"external_side_effect": "none", "delivery": "staged_memory_only"},
         )
+
+    def search_documents(self, query: str, event_id: str) -> DemoToolResult:
+        query_l = query.lower()
+        if "file_b" in query_l or "q2" in query_l:
+            results = ["file_B", "file_C"]
+        else:
+            results = ["file_A"]
+        actual_output: dict[str, object] = {"query": query, "results": results}
+        observed = set(results)
+        claim = ToolOutputAnchorClaim(
+            anchor_id=f"out:{event_id}",
+            producer_event_id=event_id,
+            content_hash=self._hash.compute_content_hash(actual_output),
+            resource_ids=observed,
+            output_type="search_results",
+        )
+        return DemoToolResult(
+            actual_output=actual_output,
+            anchor_claim=claim,
+            observed_resource_ids=observed,
+            metadata={"result_count": len(results)},
+        )
+
+    def create_file(self, file_path: str, content: str, event_id: str) -> DemoToolResult:
+        self._files[file_path] = content
+        actual_output: dict[str, object] = {"file_path": file_path, "content": content}
+        observed = {file_path}
+        claim = ToolOutputAnchorClaim(
+            anchor_id=f"out:{event_id}",
+            producer_event_id=event_id,
+            content_hash=self._hash.compute_content_hash(actual_output),
+            resource_ids=observed,
+            output_type="file_create",
+        )
+        return DemoToolResult(
+            actual_output=actual_output,
+            anchor_claim=claim,
+            observed_resource_ids=observed,
+            metadata={"created_file_path": file_path},
+        )
