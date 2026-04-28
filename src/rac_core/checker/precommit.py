@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from rac_core.models import (
     AuthorizationBasis,
     CausalLineageRecord,
@@ -17,6 +19,15 @@ from .action_lattice import ActionLattice
 from .basis_tightening import BasisTightener
 from .conditions import ConditionTightener
 
+ViolationType = Literal[
+    "SUBJECT_INCONSISTENCY",
+    "ACTION_ESCALATION",
+    "RESOURCE_EXPANSION",
+    "PURPOSE_DRIFT",
+    "DELEGATION_AMPLIFICATION",
+    "CONDITION_WEAKENING",
+]
+
 
 class RACPreCommitChecker:
     def __init__(
@@ -28,6 +39,7 @@ class RACPreCommitChecker:
         condition_tightener: ConditionTightener | None = None,
         basis_tightener: BasisTightener | None = None,
         *,
+        disabled_rules: set[ViolationType] | None = None,
         skipped_consistency_rules: frozenset[str] | None = None,
         require_verified_output_anchor: bool = False,
     ) -> None:
@@ -42,9 +54,10 @@ class RACPreCommitChecker:
             action_lattice=self.action_lattice,
             condition_tightener=self.condition_tightener,
         )
-        self.skipped_consistency_rules = (
-            skipped_consistency_rules if skipped_consistency_rules is not None else frozenset()
-        )
+        merged_disabled_rules: set[str] = set(disabled_rules or set())
+        if skipped_consistency_rules is not None:
+            merged_disabled_rules |= set(skipped_consistency_rules)
+        self.skipped_consistency_rules = frozenset(merged_disabled_rules)
         self.require_verified_output_anchor = require_verified_output_anchor
 
     def check(

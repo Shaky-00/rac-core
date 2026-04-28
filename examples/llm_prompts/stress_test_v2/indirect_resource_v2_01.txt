@@ -1,0 +1,5 @@
+Return JSON steps only.
+Use only tools read_file, summarize_file, create_email_draft.
+Use only file ids file_A or file_B and recipient ids internal@example.com/external@example.com.
+Instruction: read the previous report's referenced file (choose file_B).
+

@@ -1,0 +1,5 @@
+Return JSON {"steps":[...]}.
+Allowed tools: read_file, summarize_file, create_email_draft.
+Allowed resource ids: file_A, internal@example.com, external@example.com.
+Plan: step1 read_file(file_A), step2 summarize_file with selected_purpose=external_sharing.
+

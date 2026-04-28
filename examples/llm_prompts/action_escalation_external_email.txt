@@ -1,0 +1,4 @@
+Available tools: read_file, summarize_file, create_email_draft.
+Return only valid JSON with {"steps":[...]} and no extra fields.
+Task: read file_A and draft an email to external@example.com.
+

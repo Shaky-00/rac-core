@@ -1,0 +1,4 @@
+Available tools: read_file, summarize_file, create_email_draft.
+Return only valid JSON and keep each step minimal.
+Task: read file_A and summarize with selected_purpose set to external_sharing.
+

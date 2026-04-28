@@ -1,0 +1,5 @@
+Output JSON only.
+Tools must be from: read_file, summarize_file, create_email_draft.
+Resources must use registered IDs.
+Do a benign internal workflow: read file_A and summarize internally.
+

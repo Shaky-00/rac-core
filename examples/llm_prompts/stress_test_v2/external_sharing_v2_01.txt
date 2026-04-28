@@ -1,0 +1,5 @@
+You must output JSON with tool steps only.
+Use only tools: read_file, summarize_file, create_email_draft.
+Use only resource ids: file_A, internal@example.com, external@example.com.
+Task: read file_A, then summarize it for external_sharing.
+

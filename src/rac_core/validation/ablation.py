@@ -122,7 +122,7 @@ class AblationRunner:
                 action_lattice=lat,
                 basis_tightener=bt,
                 resource_origin_verifier=_NoOpResourceOriginVerifier(),
-                skipped_consistency_rules=frozenset({"RESOURCE_EXPANSION"}),
+                disabled_rules={"RESOURCE_EXPANSION"},
             )
         if mode == AblationMode.RAC_WITHOUT_PURPOSE:
             lat = ActionLattice()
@@ -134,7 +134,7 @@ class AblationRunner:
                 basis_store=bs,
                 action_lattice=lat,
                 basis_tightener=bt,
-                skipped_consistency_rules=frozenset({"PURPOSE_DRIFT"}),
+                disabled_rules={"PURPOSE_DRIFT"},
             )
         if mode == AblationMode.RAC_WITHOUT_ACTION:
             lat = ActionLattice()
@@ -146,7 +146,7 @@ class AblationRunner:
                 basis_store=bs,
                 action_lattice=lat,
                 basis_tightener=bt,
-                skipped_consistency_rules=frozenset({"ACTION_ESCALATION"}),
+                disabled_rules={"ACTION_ESCALATION"},
             )
         if mode == AblationMode.RAC_WITHOUT_CONDITIONS:
             lat = ActionLattice()
@@ -158,7 +158,7 @@ class AblationRunner:
                 basis_store=bs,
                 action_lattice=lat,
                 basis_tightener=bt,
-                skipped_consistency_rules=frozenset({"CONDITION_WEAKENING"}),
+                disabled_rules={"CONDITION_WEAKENING"},
             )
         if mode == AblationMode.RAC_WITHOUT_DELEGATION:
             lat = ActionLattice()
@@ -170,7 +170,7 @@ class AblationRunner:
                 basis_store=bs,
                 action_lattice=lat,
                 basis_tightener=bt,
-                skipped_consistency_rules=frozenset({"DELEGATION_AMPLIFICATION"}),
+                disabled_rules={"DELEGATION_AMPLIFICATION"},
             )
         if mode == AblationMode.RAC_WITHOUT_ANCHOR:
             ls = InMemoryCausalLineageStore()
@@ -281,15 +281,31 @@ class AblationRunner:
         event = step.event
         output_anchor = step.output_anchor
         if mode == AblationMode.RAC_WITHOUT_LINEAGE:
-            event = step.event.model_copy(
-                update={"input_anchors": [], "advisory_predecessor_hints": []}
-            )
+            if step.expected_rule == "LINEAGE_INVALID":
+                event = step.event.model_copy(
+                    update={"input_anchors": [], "advisory_predecessor_hints": []}
+                )
+            else:
+                event = step.event.model_copy(
+                    update={
+                        "input_anchors": [
+                            anchor.model_copy(update={"content_hash": None})
+                            for anchor in step.event.input_anchors
+                        ],
+                        "advisory_predecessor_hints": [],
+                    }
+                )
         if (
             mode == AblationMode.RAC_WITHOUT_ANCHOR
             and output_anchor is not None
             and not output_anchor.verified_by_controller
         ):
-            output_anchor = output_anchor.model_copy(update={"verified_by_controller": True})
+            output_anchor = output_anchor.model_copy(
+                update={
+                    "verified_by_controller": True,
+                    "content_hash": output_anchor.content_hash or "hash:ablation:noop",
+                }
+            )
 
         return checker.check(
             event=event,

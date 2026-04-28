@@ -1,0 +1,5 @@
+Produce JSON {"steps":[...]}.
+Allowed tools: read_file, summarize_file, create_email_draft.
+Allowed IDs: file_A, file_B, internal@example.com, external@example.com.
+Task: read the indirectly referenced file (file_B), then summarize with internal_summarization.
+

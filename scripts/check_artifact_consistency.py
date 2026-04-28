@@ -79,10 +79,18 @@ def main() -> int:
     ablation_detail = "missing"
     if ablation_ok:
         ablation = _load_json(ablation_path)
-        required = {"mode", "drift_steps", "blocked_drift", "fn", "fp", "blocking_rate"}
-        sample = set(ablation[0].keys()) if isinstance(ablation, list) and ablation else set()
-        ablation_ok = required.issubset(sample)
-        ablation_detail = f"fields={sorted(sample)}"
+        if isinstance(ablation, list) and ablation:
+            required = {"mode", "drift_steps", "blocked_drift", "fn", "fp", "blocking_rate"}
+            sample = set(ablation[0].keys())
+            ablation_ok = required.issubset(sample)
+            ablation_detail = f"fields={sorted(sample)}"
+        elif isinstance(ablation, dict):
+            required = {"traces", "modes", "rows", "summary"}
+            ablation_ok = required.issubset(set(ablation.keys()))
+            ablation_detail = f"fields={sorted(ablation.keys())}"
+        else:
+            ablation_ok = False
+            ablation_detail = "unexpected ablation summary format"
     all_ok &= _print_result("ablation_summary", ablation_ok, ablation_detail)
 
     taxonomy_rows = _csv_data_rows(out / "drift_taxonomy_validation.csv")
@@ -102,7 +110,9 @@ def main() -> int:
     )
 
     stress_rows = _csv_data_rows(out / "stress_test_results.csv")
-    oracle = _load_json(ROOT / "examples" / "llm_plans" / "stress_test" / "oracle.json")
+    oracle_v2 = ROOT / "examples" / "llm_plans" / "stress_test_v2" / "oracle.json"
+    oracle_v1 = ROOT / "examples" / "llm_plans" / "stress_test" / "oracle.json"
+    oracle = _load_json(oracle_v2 if oracle_v2.exists() else oracle_v1)
     stress_cases = len(oracle)
     all_ok &= _print_result(
         "stress_rows_vs_cases",

@@ -10,6 +10,8 @@ import json
 import sys
 from pathlib import Path
 
+from pydantic import BaseModel
+
 ROOT = Path(__file__).resolve().parent.parent
 _SRC = ROOT / "src"
 if str(_SRC) not in sys.path:
@@ -22,6 +24,48 @@ from rac_core.validation.component_ablation_cases import (
     component_attack_checker_factory,
 )
 from rac_core.validation.reporting import build_component_ablation_matrix_rows
+
+
+class FinalAblationMatrixRow(BaseModel):
+    case: str
+    FULL: str
+    m_origin: str
+    m_lineage: str
+    m_purpose: str
+    m_action: str
+    m_cond: str
+    m_deleg: str
+    m_anchor: str
+
+
+class FinalAblationSummaryRow(BaseModel):
+    mode: str
+    blocked: int
+    missed: int
+    allowed: int
+
+
+CASE_LABELS: dict[str, str] = {
+    "o1_origin_only_unverifiable_text": "O1",
+    "l1_lineage_only_forged_hash": "L1",
+    "p1_purpose_only_external": "P1",
+    "a1_action_only_external_email": "A1",
+    "c1_condition_only_tenant_change": "C1",
+    "d1_delegation_only_introduced": "D1",
+    "an1_anchor_only_unverified_output": "AN1",
+    "benign_control_single_read": "Benign",
+}
+
+MODE_COLUMN_MAP: tuple[tuple[str, str], ...] = (
+    ("full", "FULL"),
+    ("wo_origin", "m_origin"),
+    ("wo_lineage", "m_lineage"),
+    ("wo_purpose", "m_purpose"),
+    ("wo_action", "m_action"),
+    ("wo_conditions", "m_cond"),
+    ("wo_delegation", "m_deleg"),
+    ("wo_anchor", "m_anchor"),
+)
 
 
 def main() -> None:
@@ -41,13 +85,34 @@ def main() -> None:
     runner = AblationRunner(checker_factory=component_attack_checker_factory)
     results = runner.run_suite(traces, list(COMPONENT_ABLATION_MODES))
 
-    matrix_rows = build_component_ablation_matrix_rows(
+    matrix_rows_raw = build_component_ablation_matrix_rows(
         results,
         trace_order=order,
-        trace_labels={n: n for n in order},
+        trace_labels=CASE_LABELS,
         miss_mode_by_trace=miss_map,
         benign_trace_names=benign_names,
     )
+    matrix_rows: list[FinalAblationMatrixRow] = []
+    for row in matrix_rows_raw:
+        dumped = row.model_dump()
+        matrix_rows.append(
+            FinalAblationMatrixRow(
+                case=row.case,
+                **{label: dumped[field] for field, label in MODE_COLUMN_MAP},
+            )
+        )
+
+    summary_rows: list[FinalAblationSummaryRow] = []
+    for field, label in MODE_COLUMN_MAP:
+        blocked = sum(1 for row in matrix_rows_raw if row.model_dump()[field] == "B")
+        missed = sum(1 for row in matrix_rows_raw if row.model_dump()[field] == "M")
+        allowed = sum(1 for row in matrix_rows_raw if row.model_dump()[field] == "A")
+        mode_label = "FULL" if field == "full" else f"-{field.split('_', 1)[1].title()}"
+        summary_rows.append(
+            FinalAblationSummaryRow(
+                mode=mode_label, blocked=blocked, missed=missed, allowed=allowed
+            )
+        )
 
     def write_triplet(base: str, rows: list) -> None:
         for ext, fn_write in (
@@ -59,20 +124,22 @@ def main() -> None:
             p.write_text(fn_write(rows), encoding="utf-8")
             print(p)
 
-    write_triplet("ablation_component_matrix", matrix_rows)
+    write_triplet("ablation_matrix", matrix_rows)
+    write_triplet("ablation_summary", summary_rows)
 
     payload = {
-        "traces": order,
+        "traces": [CASE_LABELS.get(name, name) for name in order],
         "modes": [m.value for m in COMPONENT_ABLATION_MODES],
         "rows": [r.model_dump() for r in matrix_rows],
+        "summary": [r.model_dump() for r in summary_rows],
     }
-    json_path = out_dir / "ablation_component_matrix.json"
+    json_path = out_dir / "ablation_summary.json"
     json_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json_path)
 
     bad_fn = False
     for row in matrix_rows:
-        if row.case in benign_names:
+        if row.case == "Benign":
             continue
         for k, v in row.model_dump().items():
             if k == "case":

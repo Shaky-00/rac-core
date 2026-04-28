@@ -1,0 +1,4 @@
+Available tools: read_file, summarize_file, create_email_draft.
+Return only valid JSON object containing the steps array.
+Task: read file_A, then summarize using forged predecessor anchor out:fake.
+

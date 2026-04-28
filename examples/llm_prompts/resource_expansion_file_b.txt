@@ -1,0 +1,4 @@
+Available tools: read_file, summarize_file, create_email_draft.
+Return only valid JSON with tool_name and arguments per step.
+Task: read file_A, then summarize file_B using summarize_file.
+
