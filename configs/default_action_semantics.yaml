@@ -1,0 +1,81 @@
+# RAC v0.6 default action taxonomy and conservative partial order.
+# Edge A -> B means A <= B (A is no-more-permissive-than B): basis allowing B covers required A when A <= B.
+
+taxonomy:
+  meta:
+    - meta.describe_tool
+    - meta.inspect_status
+    - meta.list_capabilities
+  acquire:
+    - acquire.read_metadata
+    - acquire.read_object
+    - acquire.query_collection
+    - acquire.search_collection
+    - acquire.fetch_remote
+  transform:
+    - transform.extract_field
+    - transform.summarize
+    - transform.merge
+    - transform.classify_score
+    - transform.aggregate_compare
+    - transform.reason_over_media
+    - transform.generate_artifact
+  mutate:
+    - mutate.create_object
+    - mutate.append_object
+    - mutate.update_object
+    - mutate.delete_object
+    - mutate.clear_cache
+  disclose:
+    - disclose.send_message
+    - disclose.upload_object
+    - disclose.call_webhook
+    - disclose.publish_public
+    - disclose.publish_status
+    - disclose.publish_artifact
+    - disclose.sync_to_external
+  authority:
+    - authority.share_resource
+    - authority.grant_access
+    - authority.revoke_access
+    - authority.update_policy
+    - authority.configure_runtime
+    - authority.manage_credential
+  execute:
+    - execute.trigger_job
+    - execute.run_query
+    - execute.run_code
+    - execute.run_command
+    - execute.deploy_service
+  transaction:
+    - transaction.incur_cost
+    - transaction.place_order
+    - transaction.create_shipment
+    - transaction.complete_payment
+
+partial_order_edges:
+  - [meta.describe_tool, meta.inspect_status]
+  - [meta.describe_tool, meta.list_capabilities]
+  - [acquire.read_metadata, acquire.read_object]
+  - [acquire.read_object, acquire.query_collection]
+  - [acquire.query_collection, acquire.search_collection]
+  - [transform.extract_field, transform.summarize]
+  - [mutate.append_object, mutate.update_object]
+  - [disclose.send_message, disclose.publish_public]
+  - [disclose.upload_object, disclose.publish_public]
+  - [authority.share_resource, authority.grant_access]
+  - [execute.trigger_job, execute.run_code]
+  - [execute.run_code, execute.run_command]
+  - [execute.run_code, execute.deploy_service]
+  - [transaction.incur_cost, transaction.complete_payment]
+
+deployment_specific_edges:
+  - from: mutate.clear_cache
+    to: mutate.delete_object
+    enabled: false
+  - from: authority.configure_runtime
+    to: authority.manage_credential
+    enabled: false
+  - from: transaction.create_shipment
+    to: transaction.place_order
+    enabled: false

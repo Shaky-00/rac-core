@@ -251,6 +251,7 @@ def build_component_ablation_cases() -> list[ControlledTrace]:
                     output_anchor=None,
                     expected_decision=DecisionType.BLOCK,
                     expected_rule="ACTION_ESCALATION",
+                    required_actions=["disclose.send_message"],
                 ),
             ],
             expected_final_decision=DecisionType.BLOCK,
@@ -432,6 +433,8 @@ def build_component_ablation_cases() -> list[ControlledTrace]:
 
 def component_attack_checker_factory():
     """Checker for component attack suite (enforces verified output anchors)."""
+    from rac_core.action_semantics.registry import ActionSemanticsRegistry
+    from rac_core.action_semantics.taxonomy import default_semantics_yaml_path
     from rac_core.checker.action_lattice import ActionLattice
     from rac_core.checker.basis_tightening import BasisTightener
     from rac_core.checker.precommit import RACPreCommitChecker
@@ -440,10 +443,12 @@ def component_attack_checker_factory():
     ls = InMemoryCausalLineageStore()
     bs = InMemoryBasisStore()
     lat = ActionLattice()
+    reg = ActionSemanticsRegistry.load_from_yaml(default_semantics_yaml_path())
     return RACPreCommitChecker(
         lineage_store=ls,
         basis_store=bs,
         action_lattice=lat,
         basis_tightener=BasisTightener(action_lattice=lat),
         require_verified_output_anchor=True,
+        action_semantics_registry=reg,
     )

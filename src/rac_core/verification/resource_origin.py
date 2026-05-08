@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, model_validator
 
 from rac_core.models import GrantEnvelope, InputAnchorRef, TypedAuthorizationEvent
 from rac_core.store import InMemoryCausalLineageStore
+from rac_core.store.lineage_store import event_requires_tracebench_producer_event_id
 
 
 class ResourceOriginVerificationResult(BaseModel):
@@ -44,6 +45,8 @@ class ResourceOriginVerifier:
         resource_id: str,
         grant_envelope: GrantEnvelope,
         input_anchors: list[InputAnchorRef],
+        *,
+        require_producer_event_id_on_inputs: bool = False,
     ) -> ResourceOriginVerificationResult:
         grant_resource_ids = set(grant_envelope.resource_scope.allowed_ids)
         checked_ids = [ref.anchor_id for ref in input_anchors]
@@ -71,6 +74,7 @@ class ResourceOriginVerifier:
             input_anchors=input_anchors,
             advisory_hints=[],
             session_id=grant_envelope.session_id,
+            require_producer_event_id_on_inputs=require_producer_event_id_on_inputs,
         )
         if not predecessor_result.valid:
             return ResourceOriginVerificationResult(
@@ -206,6 +210,7 @@ class ResourceOriginVerifier:
                 },
             )
 
+        req_pe = event_requires_tracebench_producer_event_id(event.metadata)
         results: list[ResourceOriginVerificationResult] = []
         failed: set[str] = set()
         for resource_id in sorted(event.resource_scope.ids):
@@ -213,6 +218,7 @@ class ResourceOriginVerifier:
                 resource_id=resource_id,
                 grant_envelope=grant_envelope,
                 input_anchors=list(event.input_anchors),
+                require_producer_event_id_on_inputs=req_pe,
             )
             results.append(result)
             if not result.valid:

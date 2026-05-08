@@ -7,6 +7,16 @@ from rac_core.models import (
 )
 
 
+def event_requires_tracebench_producer_event_id(metadata: object) -> bool:
+    """True when TraceBench loader marked this step as requiring structured producer_event_id."""
+    if not isinstance(metadata, dict):
+        return False
+    rt = metadata.get("rac_tracebench")
+    if isinstance(rt, dict):
+        return bool(rt.get("require_producer_event_id_on_inputs"))
+    return False
+
+
 class InMemoryCausalLineageStore:
     def __init__(self) -> None:
         self._records_by_step: dict[tuple[str, str], CausalLineageRecord] = {}
@@ -116,6 +126,8 @@ class InMemoryCausalLineageStore:
         input_anchors: list[InputAnchorRef],
         advisory_hints: list[str],
         session_id: str,
+        *,
+        require_producer_event_id_on_inputs: bool = False,
     ) -> PredecessorResolutionResult:
         if not input_anchors:
             return PredecessorResolutionResult(status="NO_PREDECESSOR", valid=True)
@@ -139,6 +151,13 @@ class InMemoryCausalLineageStore:
                     reason="Input anchor producer belongs to another session.",
                     input_anchor_ids=input_anchor_ids + [anchor_ref.anchor_id],
                     producer_event_ids=producer_event_ids + [producer.event_id],
+                )
+            if require_producer_event_id_on_inputs and anchor_ref.producer_event_id is None:
+                return PredecessorResolutionResult(
+                    status="INPUT_ANCHOR_PRODUCER_BINDING_INCOMPLETE",
+                    valid=False,
+                    reason="Structured input anchor missing required producer_event_id.",
+                    input_anchor_ids=input_anchor_ids + [anchor_ref.anchor_id],
                 )
             if (
                 anchor_ref.producer_event_id is not None
@@ -181,7 +200,10 @@ class InMemoryCausalLineageStore:
                 multi_predecessor=True,
                 producer_event_ids=producer_event_ids,
                 input_anchor_ids=input_anchor_ids,
-                reason="Multiple distinct predecessor events are unsupported in v0.4.",
+                reason=(
+                    "Multiple distinct predecessor producer events are conservatively rejected; "
+                    "multi-predecessor merge is outside the current v0.6 prototype scope."
+                ),
             )
 
         predecessor = producer_records[0]

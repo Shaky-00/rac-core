@@ -46,6 +46,10 @@ class TypedAuthorizationEvent(BaseModel):
     subject: TypedEventSubject
     tool_name: str = Field(min_length=1)
     action: str = Field(min_length=1)
+    required_actions: list[str] = Field(
+        default_factory=list,
+        description="v0.6 leaf action labels from manifest.authorization_profile when present.",
+    )
     resource_scope: TypedEventResourceScope
     purpose: str = Field(min_length=1)
     conditions: TypedEventConditions = Field(default_factory=TypedEventConditions)
@@ -53,3 +57,11 @@ class TypedAuthorizationEvent(BaseModel):
     input_anchors: list[InputAnchorRef] = Field(default_factory=list)
     advisory_predecessor_hints: list[str] = Field(default_factory=list)
     metadata: dict[str, object] = Field(default_factory=dict)
+
+    def effective_required_actions(self) -> list[str]:
+        """Leaf-level required actions; falls back to the single coarse ``action`` when list is empty."""
+        if self.required_actions:
+            return list(self.required_actions)
+        if self.action:
+            return [self.action]
+        return []

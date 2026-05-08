@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from rac_core.checker.action_lattice import ActionLattice, DEFAULT_ACTION_LATTICE
+from rac_core.action_semantics.registry import ActionSemanticsRegistry
+from rac_core.action_semantics.taxonomy import default_semantics_yaml_path
 from rac_core.checker.basis_tightening import BasisTightener
-from rac_core.checker.conditions import ConditionTightener
 from rac_core.checker.precommit import RACPreCommitChecker
 from rac_core.models import DecisionType, InputAnchorRef
 from rac_core.store import InMemoryBasisStore, InMemoryCausalLineageStore
@@ -27,36 +27,16 @@ from .trace import ControlledTrace, TraceStep
 FP_SESS = "fp_sess"
 
 
-def benign_fp_action_lattice() -> ActionLattice:
-    lat = {k: set(v) for k, v in DEFAULT_ACTION_LATTICE.items()}
-    lat["read"] |= {"external_disclosure", "summarize", "derived_compute"}
-    lat["summarize"] |= {"external_disclosure", "summarize", "derived_compute", "read"}
-    lat["external_disclosure"] |= {
-        "external_disclosure",
-        "summarize",
-        "derived_compute",
-        "read",
-    }
-    lat["derived_compute"] |= {"summarize", "derived_compute", "read", "external_disclosure"}
-    return ActionLattice(lattice=lat)
-
-
 def build_benign_fp_checker() -> RACPreCommitChecker:
-    lat = benign_fp_action_lattice()
     ls = InMemoryCausalLineageStore()
     bs = InMemoryBasisStore()
-    ct = ConditionTightener()
-    bt = BasisTightener(
-        action_lattice=lat,
-        condition_tightener=ct,
-        skip_purpose_intersection=True,
-    )
     return RACPreCommitChecker(
         lineage_store=ls,
         basis_store=bs,
-        action_lattice=lat,
-        condition_tightener=ct,
-        basis_tightener=bt,
+        action_semantics_registry=ActionSemanticsRegistry.load_from_yaml(
+            default_semantics_yaml_path()
+        ),
+        basis_tightener=BasisTightener(skip_purpose_intersection=True),
         require_verified_output_anchor=False,
     )
 

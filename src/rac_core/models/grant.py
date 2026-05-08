@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TimeWindow(BaseModel):
@@ -38,6 +38,10 @@ class GrantConditions(BaseModel):
 
 
 class GrantEnvelope(BaseModel):
+    """Session grant envelope (v0.6 research MVP). Unknown fields are ignored for forward tolerance."""
+
+    model_config = ConfigDict(extra="ignore")
+
     grant_id: str = Field(min_length=1)
     session_id: str = Field(min_length=1)
     subject: GrantSubject

@@ -50,8 +50,8 @@ class MCPCaseStudySummaryRow(BaseModel):
 
 def _make_grant(session_id: str, include_external: bool = False) -> GrantEnvelope:
     actions = {"read", "summarize"}
-    tools = {"read_file", "search_documents", "summarize_text"}
-    resources = {"file_A"}
+    tools = {"read_file", "search_documents", "summarize_text", "create_email_draft"}
+    resources = {"file_A", "file_B", "file_C"}
     if include_external:
         resources.add("external@example.com")
     return GrantEnvelope(
@@ -61,7 +61,7 @@ def _make_grant(session_id: str, include_external: bool = False) -> GrantEnvelop
         allowed_actions=actions,
         allowed_tools=tools,
         resource_scope=ResourceScope(type="file", allowed_ids=resources),
-        purpose_scope={"internal_summary"},
+        purpose_scope={"internal_analysis", "external_sharing"},
         delegation=DelegationConstraint(allow_delegation=False),
         conditions=GrantConditions(environment="trusted_workspace", tenant="acme"),
     )
@@ -140,6 +140,10 @@ def _build_summary_rows(all_results: list[GuardedCallResult]) -> list[MCPCaseStu
 
 async def run_case_study() -> dict[str, object]:
     server_path = ROOT / "examples" / "mcp_official_sdk" / "mcp_demo_server.py"
+    trace_jsonl = ROOT / "examples" / "mcp_official_sdk" / "traces" / "mcp_official_sdk_v06_trace.jsonl"
+    trace_jsonl.parent.mkdir(parents=True, exist_ok=True)
+    trace_jsonl.unlink(missing_ok=True)
+
     params = StdioServerParameters(command=sys.executable, args=[str(server_path)])
     all_results: list[GuardedCallResult] = []
     rows: list[MCPCaseStudyRow] = []
@@ -153,6 +157,7 @@ async def run_case_study() -> dict[str, object]:
                 session=session,
                 session_context=_make_session("mcp_case_1"),
                 grant_envelope=_make_grant("mcp_case_1"),
+                trace_jsonl_path=trace_jsonl,
             )
             r = await c1.guarded_tool_call(
                 case_id="mcp_benign_read_summarize",
@@ -160,7 +165,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="read_file",
                 arguments={"file_id": "file_A"},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
             )
             all_results.append(r)
             rows.append(_to_row(r, "read_file(file_A)"))
@@ -170,7 +175,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="summarize_text",
                 arguments={"input_anchor": c1.last_anchor_id},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
                 input_anchor=c1.last_anchor_id,
             )
             all_results.append(r)
@@ -181,6 +186,7 @@ async def run_case_study() -> dict[str, object]:
                 session=session,
                 session_context=_make_session("mcp_case_2"),
                 grant_envelope=_make_grant("mcp_case_2"),
+                trace_jsonl_path=trace_jsonl,
             )
             r = await c2.guarded_tool_call(
                 case_id="mcp_search_read_summarize",
@@ -188,7 +194,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="search_documents",
                 arguments={"query": "Q2"},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
             )
             all_results.append(r)
             rows.append(_to_row(r, "search_documents('Q2')"))
@@ -199,7 +205,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="read_file",
                 arguments={"file_id": picked},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
             )
             all_results.append(r)
             rows.append(_to_row(r, f"search_documents('Q2') -> read_file({picked})"))
@@ -209,7 +215,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="summarize_text",
                 arguments={"input_anchor": c2.last_anchor_id},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
                 input_anchor=c2.last_anchor_id,
             )
             all_results.append(r)
@@ -220,6 +226,7 @@ async def run_case_study() -> dict[str, object]:
                 session=session,
                 session_context=_make_session("mcp_case_3"),
                 grant_envelope=_make_grant("mcp_case_3", include_external=True),
+                trace_jsonl_path=trace_jsonl,
             )
             r = await c3.guarded_tool_call(
                 case_id="mcp_action_escalation",
@@ -227,7 +234,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="read_file",
                 arguments={"file_id": "file_A"},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
             )
             all_results.append(r)
             rows.append(_to_row(r, "read_file(file_A)"))
@@ -237,7 +244,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="summarize_text",
                 arguments={"input_anchor": c3.last_anchor_id},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
                 input_anchor=c3.last_anchor_id,
             )
             all_results.append(r)
@@ -248,7 +255,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="BLOCK",
                 tool_name="create_email_draft",
                 arguments={"summary": c3.last_summary_text or "s", "recipient": "external@example.com"},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
                 input_anchor=c3.last_anchor_id,
             )
             all_results.append(r)
@@ -264,6 +271,7 @@ async def run_case_study() -> dict[str, object]:
                 session=session,
                 session_context=_make_session("mcp_case_4"),
                 grant_envelope=_make_grant("mcp_case_4"),
+                trace_jsonl_path=trace_jsonl,
             )
             r = await c4.guarded_tool_call(
                 case_id="mcp_resource_expansion",
@@ -271,7 +279,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="read_file",
                 arguments={"file_id": "file_A"},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
             )
             all_results.append(r)
             rows.append(_to_row(r, "read_file(file_A)"))
@@ -281,7 +289,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="BLOCK",
                 tool_name="read_file",
                 arguments={"file_id": "file_B"},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
             )
             all_results.append(r)
             rows.append(_to_row(r, "read_file(file_A) -> read_file(file_B)"))
@@ -291,6 +299,7 @@ async def run_case_study() -> dict[str, object]:
                 session=session,
                 session_context=_make_session("mcp_case_5"),
                 grant_envelope=_make_grant("mcp_case_5"),
+                trace_jsonl_path=trace_jsonl,
             )
             r = await c5.guarded_tool_call(
                 case_id="mcp_forged_anchor_or_predecessor",
@@ -298,7 +307,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="BLOCK",
                 tool_name="summarize_text",
                 arguments={"input_anchor": "out:fake_anchor"},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
                 input_anchor="out:fake_anchor",
             )
             all_results.append(r)
@@ -309,6 +318,7 @@ async def run_case_study() -> dict[str, object]:
                 session=session,
                 session_context=_make_session("mcp_case_6"),
                 grant_envelope=_make_grant("mcp_case_6"),
+                trace_jsonl_path=trace_jsonl,
             )
             r = await c6.guarded_tool_call(
                 case_id="mcp_purpose_drift",
@@ -316,7 +326,7 @@ async def run_case_study() -> dict[str, object]:
                 expected="ALLOW",
                 tool_name="read_file",
                 arguments={"file_id": "file_A"},
-                selected_purpose="internal_summary",
+                selected_purpose="internal_analysis",
             )
             all_results.append(r)
             rows.append(_to_row(r, "read_file(file_A)"))

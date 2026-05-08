@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from datetime import datetime
 
+from rac_core.action_semantics.registry import ActionSemanticsRegistry
+from rac_core.action_semantics.taxonomy import default_semantics_yaml_path
 from rac_core.checker import RACPreCommitChecker
 from rac_core.models import (
     DecisionType,
@@ -111,7 +113,13 @@ def build_checker_factory() -> Callable[[], RACPreCommitChecker]:
     def _factory() -> RACPreCommitChecker:
         lineage_store = InMemoryCausalLineageStore()
         basis_store = InMemoryBasisStore()
-        return RACPreCommitChecker(lineage_store=lineage_store, basis_store=basis_store)
+        return RACPreCommitChecker(
+            lineage_store=lineage_store,
+            basis_store=basis_store,
+            action_semantics_registry=ActionSemanticsRegistry.load_from_yaml(
+                default_semantics_yaml_path()
+            ),
+        )
 
     return _factory
 

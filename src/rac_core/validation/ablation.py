@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from enum import Enum
-
 from pydantic import BaseModel, Field
 
+from rac_core.action_semantics.registry import ActionSemanticsRegistry
+from rac_core.action_semantics.taxonomy import default_semantics_yaml_path
 from rac_core.checker import RACPreCommitChecker
 from rac_core.checker.action_lattice import ActionLattice
 from rac_core.checker.basis_tightening import BasisTightener
 from rac_core.models import (
+    AuthorizationBasis,
     Decision,
     DecisionType,
     GrantEnvelope,
@@ -20,18 +22,36 @@ from rac_core.store import (
     InMemoryBasisStore,
     InMemoryCausalLineageStore,
 )
+from rac_core.store.lineage_store import event_requires_tracebench_producer_event_id
 from rac_core.verification import (
     ResourceOriginBatchVerificationResult,
     ResourceOriginVerifier,
 )
+from rac_core.verification.output_anchor import output_anchor_integrity_precheck
 
-from .trace import ControlledTrace, TraceStep
+from .trace import (
+    ControlledTrace,
+    TraceStep,
+    effective_event_for_trace_step,
+    infer_grant_templates_for_trace,
+    initial_basis_from_grant_templates,
+)
+
+
+def _skip_output_anchor_integrity(mode: AblationMode) -> bool:
+    """Output-anchor observed_access gate is off for anchor-free and static-allowlist baselines."""
+    return mode in (
+        AblationMode.RAC_WITHOUT_ANCHOR,
+        AblationMode.STATIC_TOOL_ALLOWLIST,
+        AblationMode.NO_RAC,
+    )
 
 
 class AblationMode(str, Enum):
     FULL_RAC = "FULL_RAC"
     NO_RAC = "NO_RAC"
     ENTRY_ONLY_CHECK = "ENTRY_ONLY_CHECK"
+    STATIC_TOOL_ALLOWLIST = "STATIC_TOOL_ALLOWLIST"
     RAC_WITHOUT_LINEAGE = "RAC_WITHOUT_LINEAGE"
     RAC_WITHOUT_RESOURCE_ORIGIN = "RAC_WITHOUT_RESOURCE_ORIGIN"
     RAC_WITHOUT_PURPOSE = "RAC_WITHOUT_PURPOSE"
@@ -105,9 +125,15 @@ class AblationRunner:
     def __init__(self, checker_factory: Callable[[], RACPreCommitChecker]) -> None:
         self.checker_factory = checker_factory
 
+    def _sem(self) -> ActionSemanticsRegistry:
+        return ActionSemanticsRegistry.load_from_yaml(default_semantics_yaml_path())
+
     def _build_checker_for_mode(self, mode: AblationMode) -> RACPreCommitChecker | None:
         if mode == AblationMode.NO_RAC:
             return None
+        if mode == AblationMode.STATIC_TOOL_ALLOWLIST:
+            return None
+        reg = self._sem()
         if mode == AblationMode.RAC_WITHOUT_RESOURCE_ORIGIN:
             lineage_store = InMemoryCausalLineageStore()
             basis_store = InMemoryBasisStore()
@@ -123,6 +149,7 @@ class AblationRunner:
                 basis_tightener=bt,
                 resource_origin_verifier=_NoOpResourceOriginVerifier(),
                 disabled_rules={"RESOURCE_EXPANSION"},
+                action_semantics_registry=reg,
             )
         if mode == AblationMode.RAC_WITHOUT_PURPOSE:
             lat = ActionLattice()
@@ -135,18 +162,16 @@ class AblationRunner:
                 action_lattice=lat,
                 basis_tightener=bt,
                 disabled_rules={"PURPOSE_DRIFT"},
+                action_semantics_registry=reg,
             )
         if mode == AblationMode.RAC_WITHOUT_ACTION:
-            lat = ActionLattice()
-            bt = BasisTightener(action_lattice=lat, skip_action_lattice=True)
             ls = InMemoryCausalLineageStore()
             bs = InMemoryBasisStore()
             return RACPreCommitChecker(
                 lineage_store=ls,
                 basis_store=bs,
-                action_lattice=lat,
-                basis_tightener=bt,
-                disabled_rules={"ACTION_ESCALATION"},
+                action_semantics_registry=reg,
+                skipped_consistency_rules=frozenset({"ACTION_ESCALATION"}),
             )
         if mode == AblationMode.RAC_WITHOUT_CONDITIONS:
             lat = ActionLattice()
@@ -159,6 +184,7 @@ class AblationRunner:
                 action_lattice=lat,
                 basis_tightener=bt,
                 disabled_rules={"CONDITION_WEAKENING"},
+                action_semantics_registry=reg,
             )
         if mode == AblationMode.RAC_WITHOUT_DELEGATION:
             lat = ActionLattice()
@@ -171,6 +197,7 @@ class AblationRunner:
                 action_lattice=lat,
                 basis_tightener=bt,
                 disabled_rules={"DELEGATION_AMPLIFICATION"},
+                action_semantics_registry=reg,
             )
         if mode == AblationMode.RAC_WITHOUT_ANCHOR:
             ls = InMemoryCausalLineageStore()
@@ -182,6 +209,7 @@ class AblationRunner:
                 action_lattice=lat,
                 basis_tightener=BasisTightener(action_lattice=lat),
                 require_verified_output_anchor=False,
+                action_semantics_registry=reg,
             )
         return self.checker_factory()
 
@@ -190,12 +218,22 @@ class AblationRunner:
         step_results: list[AblationStepResult] = []
         blocked_at_step: str | None = None
 
+        first_ib: AuthorizationBasis | None = None
+        if checker is not None and not trace.legacy_rac_trace:
+            if trace.initial_basis is not None:
+                first_ib = trace.initial_basis
+            else:
+                tpl = infer_grant_templates_for_trace(trace)
+                if tpl:
+                    first_ib = initial_basis_from_grant_templates(trace.steps[0].grant, tpl)
+
         for idx, step in enumerate(trace.steps):
             decision = self._run_step(
                 mode=mode,
                 step_index=idx,
                 step=step,
                 checker=checker,
+                trace_initial_basis=first_ib,
             )
             observed_rules = [v.rule for v in decision.violations]
             oracle = step.expected_decision
@@ -206,6 +244,7 @@ class AblationRunner:
             if step.expected_rule is not None and observed == DecisionType.BLOCK:
                 step_pass_expected_rule = step.expected_rule in observed_rules
 
+            v_reasons = "; ".join(v.reason for v in decision.violations)
             step_results.append(
                 AblationStepResult(
                     trace_name=trace.name,
@@ -220,6 +259,8 @@ class AblationRunner:
                     metadata={
                         "expected_rule_matched": step_pass_expected_rule,
                         "ablation_mode": mode.value,
+                        "violation_reasons": v_reasons,
+                        **dict(decision.metadata),
                     },
                 )
             )
@@ -242,6 +283,7 @@ class AblationRunner:
         step_index: int,
         step: TraceStep,
         checker: RACPreCommitChecker | None,
+        trace_initial_basis: AuthorizationBasis | None = None,
     ) -> Decision:
         if mode == AblationMode.NO_RAC:
             if not step.local_allow:
@@ -258,6 +300,39 @@ class AblationRunner:
             return Decision(
                 decision=DecisionType.ALLOW,
                 metadata={"ablation_mode": mode.value},
+            )
+
+        if mode == AblationMode.STATIC_TOOL_ALLOWLIST:
+            ev = effective_event_for_trace_step(step)
+            # Baseline heuristic: paired TraceBench seed uses read + summarize only. Violation traces
+            # may add other tools (email, merge, sub-agent, …); those are denied here to surface the
+            # limits of a static tool allowlist without grant-template expansion.
+            allowlist = frozenset({"read_file", "summarize_file"})
+            if ev.tool_name not in allowlist:
+                return Decision(
+                    decision=DecisionType.BLOCK,
+                    violations=[
+                        Violation(
+                            rule="STATIC_TOOL_ALLOWLIST_DENY",
+                            reason=(
+                                f"tool_name={ev.tool_name!r} not in static allowlist {sorted(allowlist)} "
+                                "(TraceBench baseline heuristic; does not use grant_templates)."
+                            ),
+                        )
+                    ],
+                    metadata={
+                        "ablation_mode": mode.value,
+                        "baseline": "static_tool_allowlist",
+                        "output_anchor_integrity_check": "skipped_by_baseline",
+                    },
+                )
+            return Decision(
+                decision=DecisionType.ALLOW,
+                metadata={
+                    "ablation_mode": mode.value,
+                    "baseline": "static_tool_allowlist",
+                    "output_anchor_integrity_check": "skipped_by_baseline",
+                },
             )
 
         if mode == AblationMode.ENTRY_ONLY_CHECK and step_index > 0:
@@ -278,19 +353,29 @@ class AblationRunner:
             )
 
         assert checker is not None
-        event = step.event
+        event = effective_event_for_trace_step(step)
         output_anchor = step.output_anchor
+
+        integ = output_anchor_integrity_precheck(
+            step.output_anchor,
+            skip_integrity=_skip_output_anchor_integrity(mode),
+        )
+        if integ is not None:
+            return integ.model_copy(
+                update={"metadata": {**dict(integ.metadata), "ablation_mode": mode.value}}
+            )
+
         if mode == AblationMode.RAC_WITHOUT_LINEAGE:
             if step.expected_rule == "LINEAGE_INVALID":
-                event = step.event.model_copy(
+                event = event.model_copy(
                     update={"input_anchors": [], "advisory_predecessor_hints": []}
                 )
             else:
-                event = step.event.model_copy(
+                event = event.model_copy(
                     update={
                         "input_anchors": [
                             anchor.model_copy(update={"content_hash": None})
-                            for anchor in step.event.input_anchors
+                            for anchor in event.input_anchors
                         ],
                         "advisory_predecessor_hints": [],
                     }
@@ -307,13 +392,38 @@ class AblationRunner:
                 }
             )
 
-        return checker.check(
+        pred = checker.lineage_store.resolve_predecessor(
+            event.input_anchors,
+            event.advisory_predecessor_hints,
+            event.session_id,
+            require_producer_event_id_on_inputs=event_requires_tracebench_producer_event_id(
+                event.metadata
+            ),
+        )
+        init = (
+            trace_initial_basis
+            if trace_initial_basis is not None and pred.status == "NO_PREDECESSOR"
+            else None
+        )
+
+        decision = checker.check(
             event=event,
             grant_envelope=step.grant,
             local_allow=step.local_allow,
             output_anchor=output_anchor,
             persist=step.persist,
+            initial_basis=init,
         )
+        if _skip_output_anchor_integrity(mode):
+            decision = decision.model_copy(
+                update={
+                    "metadata": {
+                        **dict(decision.metadata),
+                        "output_anchor_integrity_check": "skipped_by_variant",
+                    }
+                }
+            )
+        return decision
 
     def run_suite(
         self, traces: list[ControlledTrace], modes: list[AblationMode]

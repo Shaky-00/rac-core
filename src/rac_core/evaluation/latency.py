@@ -478,6 +478,7 @@ def _mirrored_run_scenario_loop(
             ctrl.grant_envelope,
             output_anchor=verify.verified_anchor,
             persist=True,
+            initial_basis=ctrl._demo_initial_basis if idx == 0 else None,
         )
         t_c1 = perf_counter_ns()
         if timing == "components":

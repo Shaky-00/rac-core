@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from rac_core.action_semantics.registry import ActionSemanticsRegistry
+from rac_core.action_semantics.taxonomy import default_semantics_yaml_path
+from rac_core.adapter.profile_validator import (
+    ManifestProfileValidationError,
+    validate_tool_manifest,
+)
 from rac_core.models import (
     GrantEnvelope,
     SessionContext,
@@ -25,10 +31,22 @@ class EventAdapter:
         manifest_registry: InMemoryToolManifestRegistry,
         resource_registry: InMemoryResourceRegistry,
         lineage_store: InMemoryCausalLineageStore,
+        action_semantics_registry: ActionSemanticsRegistry | None = None,
     ) -> None:
         self.manifest_registry = manifest_registry
         self.resource_registry = resource_registry
         self.lineage_store = lineage_store
+        self._action_semantics_registry = action_semantics_registry
+        self._default_action_semantics: ActionSemanticsRegistry | None = None
+
+    def _semantics_for_profile_validation(self) -> ActionSemanticsRegistry:
+        if self._action_semantics_registry is not None:
+            return self._action_semantics_registry
+        if self._default_action_semantics is None:
+            self._default_action_semantics = ActionSemanticsRegistry.load_from_yaml(
+                default_semantics_yaml_path()
+            )
+        return self._default_action_semantics
 
     def construct_event(
         self,
@@ -105,6 +123,21 @@ class EventAdapter:
         if predecessor_result.warnings:
             metadata["warnings"] = predecessor_result.warnings
 
+        required_actions: list[str] = []
+        if manifest.authorization_profile is not None:
+            try:
+                validate_tool_manifest(manifest, self._semantics_for_profile_validation())
+            except ManifestProfileValidationError as exc:
+                raise EventConstructionError(str(exc)) from exc
+            required_actions = list(manifest.authorization_profile.required_actions)
+            metadata["manifest_required_actions"] = required_actions
+            metadata["manifest_authorization_profile"] = True
+
+        # Coarse-operation bridge for RACPreCommitChecker / ActionLattice: keep ``action`` as
+        # ``manifest.operation`` (read/summarize/...) even when v0.6 ``required_actions`` carries
+        # leaf labels from ``authorization_profile``.
+        coarse_operation = manifest.operation
+
         event_id = f"evt:{session_context.session_id}:{runtime_trace_context.step_id}"
 
         return TypedAuthorizationEvent(
@@ -114,7 +147,8 @@ class EventAdapter:
             step_seq=runtime_trace_context.step_seq,
             subject=subject,
             tool_name=pending_tool_call.tool_name,
-            action=manifest.operation,
+            action=coarse_operation,
+            required_actions=required_actions,
             resource_scope=resource_scope,
             purpose=purpose,
             conditions=conditions,

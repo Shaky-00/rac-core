@@ -1,10 +1,13 @@
 from rac_core.models import (
     AuthorizationBasis,
+    AuthorizationProfile,
     CausalLineageRecord,
+    EffectProfile,
     GrantConditions,
     GrantEnvelope,
     GrantSubject,
     InputAnchorRef,
+    ResourceMapping,
     ResourceScope,
     ToolManifest,
     TypedAuthorizationEvent,
@@ -41,8 +44,29 @@ def test_tool_manifest_creation() -> None:
         operation="read",
         resource_arg="file_id",
         resource_type="file",
+        authorization_profile=AuthorizationProfile(
+            required_actions=["acquire.read_object"],
+            resource_mappings=[
+                ResourceMapping(
+                    arg="file_id",
+                    resource_role="target",
+                    resource_type="file",
+                )
+            ],
+            effects=EffectProfile(
+                state_mutation=False,
+                external_disclosure=False,
+                authority_change=False,
+                real_world_effect=False,
+                consumes_anchor=False,
+                produces_anchor=True,
+                effect_boundary="internal",
+            ),
+            commit_type="read",
+        ),
     )
     assert manifest.operation == "read"
+    assert manifest.authorization_profile is not None
 
 
 def test_verified_structured_output_anchor_creation() -> None:

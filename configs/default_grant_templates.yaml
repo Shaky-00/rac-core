@@ -1,0 +1,174 @@
+# RAC v0.6 default grant templates (authoring-time profiles; expand before checker).
+# Wheel/install path resolution for this file is a follow-up; see default_grant_templates_yaml_path() docstring.
+
+templates:
+  tool_inspection:
+    description: "Inspect tool metadata and capabilities without accessing business data."
+    actions:
+      - meta.describe_tool
+      - meta.inspect_status
+      - meta.list_capabilities
+    purpose_constraints: []
+    conditions:
+      business_data_access: false
+      state_mutation: false
+      external_disclosure: false
+    delegation: {}
+
+  read_only_retrieval:
+    description: "Read-only metadata and object retrieval without search fan-out."
+    actions:
+      - meta.describe_tool
+      - acquire.read_metadata
+      - acquire.read_object
+      - acquire.query_collection
+    purpose_constraints: []
+    conditions:
+      state_mutation: false
+      external_disclosure: false
+    delegation: {}
+
+  search_and_retrieval:
+    description: "Search and remote-capable retrieval without state mutation."
+    actions:
+      - acquire.read_metadata
+      - acquire.read_object
+      - acquire.query_collection
+      - acquire.search_collection
+      - acquire.fetch_remote
+    purpose_constraints: []
+    conditions:
+      state_mutation: false
+      external_disclosure: false
+      remote_fetch_allowed: true
+    delegation: {}
+
+  internal_analysis:
+    description: "Internal analysis transforms on retrieved data."
+    actions:
+      - acquire.read_metadata
+      - acquire.read_object
+      - acquire.query_collection
+      - transform.extract_field
+      - transform.summarize
+      - transform.classify_score
+      - transform.aggregate_compare
+    purpose_constraints:
+      - internal_analysis
+    conditions:
+      state_mutation: false
+      external_disclosure: false
+    delegation: {}
+
+  internal_artifact_generation:
+    description: "Create structured artifacts with anchor provenance."
+    actions:
+      - transform.generate_artifact
+      - mutate.create_object
+    purpose_constraints: []
+    conditions:
+      external_disclosure: false
+      produces_anchor: true
+    delegation: {}
+
+  internal_analysis_full:
+    description: "Full internal analysis plus artifact generation with limited internal create."
+    actions:
+      - acquire.read_metadata
+      - acquire.read_object
+      - acquire.query_collection
+      - transform.extract_field
+      - transform.summarize
+      - transform.classify_score
+      - transform.aggregate_compare
+      - transform.generate_artifact
+      - mutate.create_object
+    purpose_constraints:
+      - internal_analysis
+    conditions:
+      state_mutation: limited_internal_create
+      external_disclosure: false
+      produces_anchor: true
+    delegation: {}
+
+  internal_state_management:
+    description: "Mutate internal objects without external disclosure or authority changes."
+    actions:
+      - mutate.create_object
+      - mutate.append_object
+      - mutate.update_object
+      - mutate.clear_cache
+    purpose_constraints: []
+    conditions:
+      external_disclosure: false
+      authority_change: false
+    delegation: {}
+
+  external_disclosure_limited:
+    description: "Limited external channels with scope and approval gates."
+    actions:
+      - disclose.send_message
+      - disclose.upload_object
+      - disclose.call_webhook
+      - disclose.sync_to_external
+    purpose_constraints: []
+    conditions:
+      recipient_scope_required: true
+      content_scope_required: true
+      purpose_required: true
+      approval_required: deployment_policy
+    delegation: {}
+
+  public_publication:
+    description: "Public publication with audit and approval."
+    actions:
+      - disclose.publish_public
+    purpose_constraints: []
+    conditions:
+      approval_required: true
+      public_release: true
+      audit_required: true
+    delegation: {}
+
+  authority_administration:
+    description: "Share, grant, revoke, policy, runtime, and credential administration."
+    actions:
+      - authority.share_resource
+      - authority.grant_access
+      - authority.revoke_access
+      - authority.update_policy
+      - authority.configure_runtime
+      - authority.manage_credential
+    purpose_constraints: []
+    conditions:
+      human_confirmation_required: true
+      audit_required: true
+    delegation: {}
+
+  execution_operation:
+    description: "Execute jobs, queries, code, commands, and deployments in sandbox."
+    actions:
+      - execute.trigger_job
+      - execute.run_query
+      - execute.run_code
+      - execute.run_command
+      - execute.deploy_service
+    purpose_constraints: []
+    conditions:
+      sandbox_required: true
+      audit_required: true
+    delegation: {}
+
+  transaction_operation:
+    description: "Financial / transactional operations with budget and human gates."
+    actions:
+      - transaction.incur_cost
+      - transaction.place_order
+      - transaction.create_shipment
+      - transaction.complete_payment
+    purpose_constraints: []
+    conditions:
+      budget_limit_required: true
+      human_confirmation_required: true
+      audit_required: true
+    delegation: {}

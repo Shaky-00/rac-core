@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Literal
 
+from rac_core.action_semantics.coverage import action_covered
+from rac_core.action_semantics.registry import ActionSemanticsRegistry
+from rac_core.action_semantics.taxonomy import default_semantics_yaml_path
 from rac_core.models import (
     AuthorizationBasis,
     CausalLineageRecord,
@@ -13,6 +16,7 @@ from rac_core.models import (
     Violation,
 )
 from rac_core.store import InMemoryBasisStore, InMemoryCausalLineageStore
+from rac_core.store.lineage_store import event_requires_tracebench_producer_event_id
 from rac_core.verification import ResourceOriginVerifier
 
 from .action_lattice import ActionLattice
@@ -22,6 +26,7 @@ from .conditions import ConditionTightener
 ViolationType = Literal[
     "SUBJECT_INCONSISTENCY",
     "ACTION_ESCALATION",
+    "ACTION_BASIS_MISSING",
     "RESOURCE_EXPANSION",
     "PURPOSE_DRIFT",
     "DELEGATION_AMPLIFICATION",
@@ -39,6 +44,7 @@ class RACPreCommitChecker:
         condition_tightener: ConditionTightener | None = None,
         basis_tightener: BasisTightener | None = None,
         *,
+        action_semantics_registry: ActionSemanticsRegistry | None = None,
         disabled_rules: set[ViolationType] | None = None,
         skipped_consistency_rules: frozenset[str] | None = None,
         require_verified_output_anchor: bool = False,
@@ -54,11 +60,22 @@ class RACPreCommitChecker:
             action_lattice=self.action_lattice,
             condition_tightener=self.condition_tightener,
         )
+        self._action_semantics_registry_override = action_semantics_registry
+        self._action_semantics_registry_lazy: ActionSemanticsRegistry | None = None
         merged_disabled_rules: set[str] = set(disabled_rules or set())
         if skipped_consistency_rules is not None:
             merged_disabled_rules |= set(skipped_consistency_rules)
         self.skipped_consistency_rules = frozenset(merged_disabled_rules)
         self.require_verified_output_anchor = require_verified_output_anchor
+
+    def _action_semantics_registry(self) -> ActionSemanticsRegistry:
+        if self._action_semantics_registry_override is not None:
+            return self._action_semantics_registry_override
+        if self._action_semantics_registry_lazy is None:
+            self._action_semantics_registry_lazy = ActionSemanticsRegistry.load_from_yaml(
+                default_semantics_yaml_path()
+            )
+        return self._action_semantics_registry_lazy
 
     def check(
         self,
@@ -68,6 +85,7 @@ class RACPreCommitChecker:
         local_allow: bool = True,
         output_anchor: VerifiedStructuredOutputAnchor | None = None,
         persist: bool = True,
+        initial_basis: AuthorizationBasis | None = None,
     ) -> Decision:
         if not local_allow:
             return Decision(
@@ -94,6 +112,9 @@ class RACPreCommitChecker:
             event.input_anchors,
             event.advisory_predecessor_hints,
             event.session_id,
+            require_producer_event_id_on_inputs=event_requires_tracebench_producer_event_id(
+                event.metadata
+            ),
         )
         if not predecessor.valid:
             if predecessor.multi_predecessor:
@@ -129,9 +150,12 @@ class RACPreCommitChecker:
                     "Unable to load predecessor finalized basis from BasisStore.",
                 )
         else:
-            inherited_basis = AuthorizationBasis.from_grant_envelope(
-                grant_envelope, basis_id=f"basis:initial:{event.session_id}"
-            )
+            if initial_basis is not None:
+                inherited_basis = initial_basis
+            else:
+                inherited_basis = AuthorizationBasis.from_grant_envelope(
+                    grant_envelope, basis_id=f"basis:initial:{event.session_id}"
+                )
 
         violations = self._check_consistency(event, inherited_basis)
         if violations:
@@ -207,13 +231,18 @@ class RACPreCommitChecker:
                 )
 
         if "ACTION_ESCALATION" not in skip:
-            if not self.action_lattice.is_action_allowed(event.action, inherited_basis.actions):
-                violations.append(
-                    Violation(
-                        rule="ACTION_ESCALATION",
-                        reason="event action is more permissive than inherited basis",
-                    )
+            if event.required_actions:
+                violations.extend(
+                    self._check_action_coverage_v06(event, inherited_basis)
                 )
+            else:
+                if not self.action_lattice.is_action_allowed(event.action, inherited_basis.actions):
+                    violations.append(
+                        Violation(
+                            rule="ACTION_ESCALATION",
+                            reason="event action is more permissive than inherited basis",
+                        )
+                    )
 
         if "RESOURCE_EXPANSION" not in skip:
             if not set(event.resource_scope.ids).issubset(inherited_basis.resource_scope.ids):
@@ -280,3 +309,44 @@ class RACPreCommitChecker:
                 )
 
         return violations
+
+    def _check_action_coverage_v06(
+        self, event: TypedAuthorizationEvent, basis: AuthorizationBasis
+    ) -> list[Violation]:
+        """v0.6 leaf coverage when ``event.required_actions`` is non-empty.
+
+        When ``basis.allowed_action_labels`` is empty, refuse the coarse ``basis.actions``
+        fallback (mixed / ambiguous state). Otherwise require every ``required_actions``
+        entry be covered under the configured partial order
+        (:func:`~rac_core.action_semantics.coverage.action_covered`).
+        """
+        if not basis.allowed_action_labels:
+            return [
+                Violation(
+                    rule="ACTION_BASIS_MISSING",
+                    reason=(
+                        "event.required_actions is non-empty but inherited basis.allowed_action_labels "
+                        "is empty; v0.6 action coverage cannot run and coarse basis.actions are not used "
+                        "as a fallback."
+                    ),
+                )
+            ]
+        reg = self._action_semantics_registry()
+        allowed = set(basis.allowed_action_labels)
+        try:
+            uncovered = [
+                r for r in event.required_actions if not action_covered(r, allowed, reg)
+            ]
+        except ValueError as exc:
+            return [Violation(rule="ACTION_ESCALATION", reason=str(exc))]
+        if uncovered:
+            return [
+                Violation(
+                    rule="ACTION_ESCALATION",
+                    reason=(
+                        "v0.6 action coverage failed; uncovered required_action(s): "
+                        + ", ".join(sorted(uncovered))
+                    ),
+                )
+            ]
+        return []

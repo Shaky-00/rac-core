@@ -35,6 +35,11 @@ from .trace import (
     TraceStep,
     TraceStepResult,
     build_taxonomy_traces,
+    build_trace_inference_report,
+    describe_trace_grant_inference,
+    effective_event_for_trace_step,
+    infer_grant_templates_for_trace,
+    initial_basis_from_grant_templates,
 )
 
 __all__ = [
@@ -72,4 +77,9 @@ __all__ = [
     "ControlledTraceResult",
     "TraceRunner",
     "build_taxonomy_traces",
+    "build_trace_inference_report",
+    "describe_trace_grant_inference",
+    "effective_event_for_trace_step",
+    "infer_grant_templates_for_trace",
+    "initial_basis_from_grant_templates",
 ]

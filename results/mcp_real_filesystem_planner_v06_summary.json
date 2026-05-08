@@ -1,0 +1,33 @@
+{
+  "variants": [
+    "FULL_RAC",
+    "NO_RAC"
+  ],
+  "total_plans": 6,
+  "total_steps": 20,
+  "total_steps_by_variant": {
+    "FULL_RAC": 10,
+    "NO_RAC": 10
+  },
+  "match_rate_by_variant": {
+    "FULL_RAC": 1.0,
+    "NO_RAC": 0.6
+  },
+  "blocked_steps_by_variant": {
+    "FULL_RAC": 4,
+    "NO_RAC": 0
+  },
+  "server_call_issued_count_by_variant": {
+    "FULL_RAC": 6,
+    "NO_RAC": 10
+  },
+  "side_effect_materialized_count_by_variant": {
+    "FULL_RAC": 0,
+    "NO_RAC": 2
+  },
+  "full_rac_blocked_side_effects": 2,
+  "no_rac_materialized_side_effects": 2,
+  "generated_at": "2026-05-06T09:19:25.366320Z",
+  "server_command": "npx -y @modelcontextprotocol/server-filesystem <sandbox_root>",
+  "notes": "Deterministic planner JSON → real filesystem MCP (stdio). FULL_RAC uses GuardedRealFilesystemClient; NO_RAC bypasses RAC and calls tools directly. Compare security_violation_materialized and side_effect_exists across variants."
+}

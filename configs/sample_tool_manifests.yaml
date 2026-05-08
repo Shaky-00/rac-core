@@ -1,0 +1,172 @@
+# Sample v0.6 tool manifests with authorization_profile (trusted manifest source).
+tools:
+  read_file:
+    tool_name: read_file
+    operation: read
+    resource_arg: file_id
+    resource_type: file
+    resource_pattern: "file:*"
+    output_anchor_fields:
+      - output_id
+      - content_hash
+      - resource_ids
+    authorization_effect: read_only
+    commit_type: read
+    authorization_profile:
+      required_actions:
+        - acquire.read_object
+      resource_mappings:
+        - arg: file_id
+          resource_role: target
+          resource_type: file
+          resource_pattern: "file:*"
+      effects:
+        state_mutation: false
+        external_disclosure: false
+        authority_change: false
+        real_world_effect: false
+        consumes_anchor: false
+        produces_anchor: true
+        effect_boundary: internal
+      output_anchor_fields:
+        - output_id
+        - content_hash
+        - resource_ids
+      commit_type: read
+
+  summarize_file:
+    tool_name: summarize_file
+    operation: summarize
+    resource_arg: input_anchor
+    resource_type: derived_content
+    resource_pattern: "anchor:*"
+    output_anchor_fields:
+      - output_id
+      - content_hash
+      - source_resource_ids
+    authorization_effect: derived_read
+    commit_type: compute
+    authorization_profile:
+      required_actions:
+        - transform.summarize
+      resource_mappings:
+        - arg: input_anchor
+          resource_role: input
+          resource_type: derived_content
+          resource_pattern: "anchor:*"
+      effects:
+        state_mutation: false
+        external_disclosure: false
+        authority_change: false
+        real_world_effect: false
+        consumes_anchor: true
+        produces_anchor: true
+        effect_boundary: internal
+      output_anchor_fields:
+        - output_id
+        - content_hash
+        - source_resource_ids
+      commit_type: compute
+
+  compare_reports:
+    tool_name: compare_reports
+    operation: read
+    resource_arg: input_anchors
+    resource_type: derived_content
+    resource_pattern: "anchor:*"
+    output_anchor_fields:
+      - output_id
+      - content_hash
+      - source_resource_ids
+    authorization_effect: derived_read
+    commit_type: compute
+    authorization_profile:
+      required_actions:
+        - acquire.query_collection
+        - transform.aggregate_compare
+      resource_mappings:
+        - arg: input_anchors
+          resource_role: input
+          resource_type: derived_content
+          resource_pattern: "anchor:*"
+      effects:
+        state_mutation: false
+        external_disclosure: false
+        authority_change: false
+        real_world_effect: false
+        consumes_anchor: true
+        produces_anchor: true
+        effect_boundary: internal
+      output_anchor_fields:
+        - output_id
+        - content_hash
+        - source_resource_ids
+      commit_type: compute
+
+  create_email_draft:
+    tool_name: create_email_draft
+    operation: external_disclosure
+    resource_arg: recipient
+    resource_type: external_channel
+    resource_pattern: "email:*"
+    output_anchor_fields:
+      - draft_id
+      - content_hash
+    authorization_effect: external_write
+    commit_type: write_external
+    authorization_profile:
+      required_actions:
+        - disclose.send_message
+      resource_mappings:
+        - arg: recipient
+          resource_role: recipient
+          resource_type: external_channel
+          resource_pattern: "email:*"
+        - arg: input_anchor
+          resource_role: input
+          resource_type: derived_content
+          resource_pattern: "anchor:*"
+      effects:
+        state_mutation: true
+        external_disclosure: true
+        authority_change: false
+        real_world_effect: false
+        consumes_anchor: true
+        produces_anchor: true
+        effect_boundary: external
+      output_anchor_fields:
+        - draft_id
+        - content_hash
+      commit_type: write_external
+
+  update_policy:
+    tool_name: update_policy
+    operation: write
+    resource_arg: policy_id
+    resource_type: policy
+    resource_pattern: "policy:*"
+    output_anchor_fields:
+      - policy_update_id
+      - content_hash
+    authorization_effect: authority_write
+    commit_type: authority_change
+    authorization_profile:
+      required_actions:
+        - authority.update_policy
+      resource_mappings:
+        - arg: policy_id
+          resource_role: target
+          resource_type: policy
+          resource_pattern: "policy:*"
+      effects:
+        state_mutation: true
+        external_disclosure: false
+        authority_change: true
+        real_world_effect: false
+        consumes_anchor: false
+        produces_anchor: true
+        effect_boundary: authority
+      output_anchor_fields:
+        - policy_update_id
+        - content_hash
+      commit_type: authority_change

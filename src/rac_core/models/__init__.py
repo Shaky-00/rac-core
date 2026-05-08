@@ -18,7 +18,12 @@ from .grant import (
     TimeWindow,
 )
 from .lineage import CausalLineageRecord, PredecessorResolutionResult
-from .manifest import ToolManifest
+from .manifest import (
+    AuthorizationProfile,
+    EffectProfile,
+    ResourceMapping,
+    ToolManifest,
+)
 from .resource import ResourceMetadata
 from .session import SessionContext
 from .tool_call import PendingToolCall, RuntimeTraceContext
@@ -30,6 +35,9 @@ __all__ = [
     "DelegationConstraint",
     "GrantConditions",
     "TimeWindow",
+    "AuthorizationProfile",
+    "EffectProfile",
+    "ResourceMapping",
     "ToolManifest",
     "VerifiedStructuredOutputAnchor",
     "TypedAuthorizationEvent",

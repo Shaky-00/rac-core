@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rac-core"
 version = "0.1.0"
-description = "RAC core runtime and stores."
+description = "RAC (Runtime Authorization Consistency) v0.6 prototype core runtime and stores."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2.7,<3.0", "mcp>=1.0,<2.0"]
+dependencies = ["pydantic>=2.7,<3.0", "mcp>=1.0,<2.0", "PyYAML>=6.0,<7.0"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0,<9.0", "matplotlib>=3.8,<4"]
@@ -20,5 +20,5 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]

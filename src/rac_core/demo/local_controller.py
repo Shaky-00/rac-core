@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from rac_core.action_semantics.registry import ActionSemanticsRegistry
+from rac_core.action_semantics.taxonomy import default_semantics_yaml_path
 from rac_core.adapter import EventAdapter, EventConstructionError
-from rac_core.checker.action_lattice import ActionLattice, DEFAULT_ACTION_LATTICE
 from rac_core.checker import RACPreCommitChecker
+from rac_core.checker.action_lattice import ActionLattice, DEFAULT_ACTION_LATTICE
 from rac_core.models import (
+    AuthorizationBasis,
     Decision,
     DecisionType,
     GrantEnvelope,
@@ -22,10 +25,39 @@ from rac_core.registry import (
     build_default_manifest_registry,
 )
 from rac_core.store import InMemoryBasisStore, InMemoryCausalLineageStore
+from rac_core.validation.trace import initial_basis_from_grant_templates
 from rac_core.verification import OutputAnchorVerifier
 
 from .models import DemoRunResult, DemoStepResult
 from .scripted_planner import ScriptedPlanner
+
+# Default demo templates: broad internal analysis + artifact create (matches historical demo).
+DEMO_DEFAULT_GRANT_TEMPLATE_IDS: tuple[str, ...] = ("internal_analysis_full",)
+
+
+def demo_initial_basis_from_grant(
+    grant: GrantEnvelope,
+    *,
+    grant_template_ids: list[str] | None = None,
+) -> AuthorizationBasis:
+    """v0.6 initial basis for deterministic demos; same core logic as ``TraceRunner`` / validation.
+
+    Delegates to :func:`rac_core.validation.trace.initial_basis_from_grant_templates` so
+    ``allowed_action_labels``, compiled profile fields, grant ``conditions`` / ``delegation``,
+    and ``purpose_scope`` union stay aligned with controlled-trace tooling.
+    """
+    ids = list(grant_template_ids) if grant_template_ids is not None else list(
+        DEMO_DEFAULT_GRANT_TEMPLATE_IDS
+    )
+    return initial_basis_from_grant_templates(
+        grant,
+        ids,
+        basis_id=f"basis:demo_initial:{grant.session_id}",
+    )
+
+
+# Backward-compatible name used by ``examples/mcp_live_enforcement`` and latency harness.
+_demo_initial_basis_from_grant = demo_initial_basis_from_grant
 
 
 class DemoEventAdapter(EventAdapter):
@@ -76,10 +108,15 @@ class LocalRACController:
         self.basis_store = InMemoryBasisStore()
         self.resource_registry = _build_demo_resource_registry()
         self.manifest_registry = build_default_manifest_registry()
+        self._demo_initial_basis = _demo_initial_basis_from_grant(grant_envelope)
+        self._action_semantics = ActionSemanticsRegistry.load_from_yaml(
+            default_semantics_yaml_path()
+        )
         self.event_adapter = DemoEventAdapter(
             manifest_registry=self.manifest_registry,
             resource_registry=self.resource_registry,
             lineage_store=self.lineage_store,
+            action_semantics_registry=self._action_semantics,
         )
         self.output_verifier = OutputAnchorVerifier(self.resource_registry)
         lat = {k: set(v) for k, v in DEFAULT_ACTION_LATTICE.items()}
@@ -89,6 +126,7 @@ class LocalRACController:
             lineage_store=self.lineage_store,
             basis_store=self.basis_store,
             action_lattice=ActionLattice(lattice=lat),
+            action_semantics_registry=self._action_semantics,
         )
 
     def run_scenario(self, scenario_name: str) -> DemoRunResult:
@@ -227,6 +265,7 @@ class LocalRACController:
                 self.grant_envelope,
                 output_anchor=verify.verified_anchor,
                 persist=True,
+                initial_basis=self._demo_initial_basis if idx == 0 else None,
             )
 
             step_metadata: dict[str, object] = {

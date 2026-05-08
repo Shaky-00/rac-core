@@ -1,4 +1,19 @@
-from rac_core.models import ToolManifest
+from __future__ import annotations
+
+from pathlib import Path
+
+import yaml
+
+from rac_core.models import (
+    AuthorizationProfile,
+    EffectProfile,
+    ResourceMapping,
+    ToolManifest,
+)
+
+_SAMPLE_TOOL_MANIFESTS = (
+    Path(__file__).resolve().parents[3] / "configs" / "sample_tool_manifests.yaml"
+)
 
 
 class InMemoryToolManifestRegistry:
@@ -26,45 +41,27 @@ class InMemoryToolManifestRegistry:
         return sorted(self._manifests.keys())
 
 
-def build_default_manifest_registry() -> InMemoryToolManifestRegistry:
-    registry = InMemoryToolManifestRegistry()
-    registry.register(
-        ToolManifest(
-            tool_name="read_file",
-            operation="read",
-            resource_arg="file_id",
-            resource_type="file",
-            resource_pattern="file:*",
-            output_anchor_fields=["output_id", "content_hash", "resource_ids"],
-            authorization_effect="read_only",
-            commit_type="read",
-        )
+def _extra_registry_tools() -> list[ToolManifest]:
+    """Tools referenced by demos/tests but not defined in ``sample_tool_manifests.yaml``."""
+    internal_read_effects = EffectProfile(
+        state_mutation=False,
+        external_disclosure=False,
+        authority_change=False,
+        real_world_effect=False,
+        consumes_anchor=False,
+        produces_anchor=True,
+        effect_boundary="internal",
     )
-    registry.register(
-        ToolManifest(
-            tool_name="summarize_file",
-            operation="summarize",
-            resource_arg="input_anchor",
-            resource_type="derived_content",
-            resource_pattern="anchor:*",
-            output_anchor_fields=["output_id", "content_hash", "source_resource_ids"],
-            authorization_effect="derived_read",
-            commit_type="compute",
-        )
+    internal_write_effects = EffectProfile(
+        state_mutation=True,
+        external_disclosure=False,
+        authority_change=False,
+        real_world_effect=False,
+        consumes_anchor=False,
+        produces_anchor=True,
+        effect_boundary="internal",
     )
-    registry.register(
-        ToolManifest(
-            tool_name="create_email_draft",
-            operation="external_disclosure",
-            resource_arg="recipient",
-            resource_type="external_channel",
-            resource_pattern="email:*",
-            output_anchor_fields=["draft_id", "content_hash"],
-            authorization_effect="external_write",
-            commit_type="write_external",
-        )
-    )
-    registry.register(
+    return [
         ToolManifest(
             tool_name="search_documents",
             operation="read",
@@ -74,9 +71,21 @@ def build_default_manifest_registry() -> InMemoryToolManifestRegistry:
             output_anchor_fields=["output_id", "content_hash", "resource_ids"],
             authorization_effect="read_only",
             commit_type="read",
-        )
-    )
-    registry.register(
+            authorization_profile=AuthorizationProfile(
+                required_actions=["acquire.query_collection"],
+                resource_mappings=[
+                    ResourceMapping(
+                        arg="results",
+                        resource_role="target",
+                        resource_type="file",
+                        resource_pattern="file:*",
+                    )
+                ],
+                effects=internal_read_effects,
+                output_anchor_fields=["output_id", "content_hash", "resource_ids"],
+                commit_type="read",
+            ),
+        ),
         ToolManifest(
             tool_name="create_file",
             operation="write",
@@ -86,6 +95,31 @@ def build_default_manifest_registry() -> InMemoryToolManifestRegistry:
             output_anchor_fields=["output_id", "content_hash", "resource_ids"],
             authorization_effect="write_local",
             commit_type="write",
-        )
-    )
+            authorization_profile=AuthorizationProfile(
+                required_actions=["mutate.create_object"],
+                resource_mappings=[
+                    ResourceMapping(
+                        arg="file_path",
+                        resource_role="target",
+                        resource_type="file",
+                        resource_pattern="file:*",
+                    )
+                ],
+                effects=internal_write_effects,
+                output_anchor_fields=["output_id", "content_hash", "resource_ids"],
+                commit_type="write",
+            ),
+        ),
+    ]
+
+
+def build_default_manifest_registry() -> InMemoryToolManifestRegistry:
+    """Load canonical v0.6 sample manifests plus a few extra tools used by older demos."""
+    registry = InMemoryToolManifestRegistry()
+    with open(_SAMPLE_TOOL_MANIFESTS, encoding="utf-8") as f:
+        raw = yaml.safe_load(f)
+    for _name, spec in raw["tools"].items():
+        registry.register(ToolManifest.model_validate(spec))
+    for m in _extra_registry_tools():
+        registry.register(m)
     return registry

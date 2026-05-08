@@ -5,8 +5,96 @@ import json
 
 from pydantic import BaseModel, Field, model_validator
 
-from rac_core.models import TypedAuthorizationEvent, VerifiedStructuredOutputAnchor
+from rac_core.models import (
+    Decision,
+    DecisionType,
+    TypedAuthorizationEvent,
+    VerifiedStructuredOutputAnchor,
+    Violation,
+)
 from rac_core.registry import InMemoryResourceRegistry
+
+
+def output_anchor_integrity_precheck(
+    output_anchor: VerifiedStructuredOutputAnchor | None,
+    *,
+    skip_integrity: bool,
+) -> Decision | None:
+    """Optional TraceBench-style observed_access vs structured anchor gate before PreCommit.
+
+    When ``skip_integrity`` is True (e.g. RAC_WITHOUT_OUTPUT_ANCHOR / STATIC_TOOL_ALLOWLIST),
+    returns ``None`` so the caller continues with the main checker path.
+
+    When the gate fires, returns a BLOCK :class:`~rac_core.models.decision.Decision` with rule
+    ``OUTPUT_ANCHOR_MISMATCH`` and metadata ``output_anchor_integrity_check=enabled``.
+    """
+    if skip_integrity or output_anchor is None:
+        return None
+    ok, reason = verify_observed_access_matches_anchor(output_anchor)
+    if ok:
+        return None
+    return Decision(
+        decision=DecisionType.BLOCK,
+        violations=[
+            Violation(
+                rule="OUTPUT_ANCHOR_MISMATCH",
+                reason=reason or "observed_access inconsistent with structured output anchor",
+                metadata={"OutputAnchorIntegrity": True},
+            )
+        ],
+        metadata={"output_anchor_integrity_check": "enabled"},
+    )
+
+
+def verify_observed_access_matches_anchor(
+    output_anchor: VerifiedStructuredOutputAnchor,
+) -> tuple[bool, str | None]:
+    """Cross-check fixture ``observed_access`` telemetry against the structured anchor fields.
+
+    Reads ``output_anchor.metadata["observed_access"]`` when present (TraceBench / replay).
+    When absent, returns ``(True, None)`` so normal traces are unaffected.
+
+    Returns:
+        ``(True, None)`` if valid or no ``observed_access``; otherwise ``(False, reason)``.
+    """
+    raw_obs = output_anchor.metadata.get("observed_access")
+    if raw_obs is None:
+        return True, None
+    if not isinstance(raw_obs, dict):
+        return False, "observed_access must be a JSON object when present."
+
+    declared_resources = set(output_anchor.resource_ids)
+    observed_resources: set[str] = set()
+    for key in ("resource_ids", "actual_resource_ids", "bytes_read_from_resources"):
+        val = raw_obs.get(key)
+        if isinstance(val, list):
+            observed_resources.update(str(x) for x in val)
+
+    if observed_resources:
+        extraneous = observed_resources - declared_resources
+        if extraneous:
+            return (
+                False,
+                "observed_access references resource(s) not declared on output_anchor.resource_ids: "
+                f"{sorted(extraneous)} (declared {sorted(declared_resources)})",
+            )
+
+    declared_hash = output_anchor.content_hash
+    observed_hashes: list[str] = []
+    for key in ("content_hash", "actual_content_sha256", "observed_summary_sha256"):
+        v = raw_obs.get(key)
+        if isinstance(v, str) and v.strip():
+            observed_hashes.append(v.strip())
+
+    if observed_hashes:
+        if declared_hash not in observed_hashes:
+            return (
+                False,
+                "observed_access digest(s) disagree with output_anchor.content_hash "
+                f"(declared {declared_hash!r}, observed {observed_hashes!r})",
+            )
+
+    return True, None
 
 
 class ToolOutputAnchorClaim(BaseModel):

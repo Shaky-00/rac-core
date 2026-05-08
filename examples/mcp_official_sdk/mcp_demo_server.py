@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+import json
+import os
 from typing import Any
 
 from mcp.server import Server
@@ -80,8 +82,18 @@ async def list_tools() -> list[Tool]:
     ]
 
 
+def _log_server_call(name: str, arguments: dict[str, Any]) -> None:
+    path = os.environ.get("MCP_OFFICIAL_SDK_SERVER_CALL_LOG")
+    if not path:
+        return
+    rec = {"tool": name, "arguments": dict(arguments)}
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
 @SERVER.call_tool()
 async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
+    _log_server_call(name, arguments)
     if name == "read_file":
         file_id = str(arguments["file_id"])
         if file_id not in RESOURCES:

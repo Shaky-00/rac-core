@@ -1,0 +1,39 @@
+{
+  "resources": [
+    {
+      "resource_id": "res:report:A",
+      "resource_type": "file",
+      "labels": [
+        "internal"
+      ]
+    },
+    {
+      "resource_id": "res:report:B",
+      "resource_type": "file",
+      "labels": [
+        "restricted"
+      ]
+    },
+    {
+      "resource_id": "res:report:A_injected",
+      "resource_type": "file",
+      "labels": [
+        "injected"
+      ]
+    },
+    {
+      "resource_id": "res:index:reports",
+      "resource_type": "file",
+      "labels": [
+        "index"
+      ]
+    },
+    {
+      "resource_id": "recipient:external_partner",
+      "resource_type": "external_channel",
+      "labels": [
+        "external"
+      ]
+    }
+  ]
+}

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pytest
 
+from rac_core.action_semantics.registry import ActionSemanticsRegistry
+from rac_core.action_semantics.taxonomy import default_semantics_yaml_path
 from rac_core.checker import RACPreCommitChecker
 from rac_core.models import DecisionType
 from rac_core.store import InMemoryBasisStore, InMemoryCausalLineageStore
@@ -15,6 +17,9 @@ def _fresh_runner() -> TraceRunner:
         RACPreCommitChecker(
             lineage_store=InMemoryCausalLineageStore(),
             basis_store=InMemoryBasisStore(),
+            action_semantics_registry=ActionSemanticsRegistry.load_from_yaml(
+                default_semantics_yaml_path()
+            ),
         )
     )
 

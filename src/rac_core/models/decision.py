@@ -4,6 +4,13 @@ from pydantic import BaseModel, Field
 
 
 class DecisionType(str, Enum):
+    """Authorization decision for a pending step.
+
+    The v0.6 prototype :class:`~rac_core.checker.precommit.RACPreCommitChecker` returns
+    only ``ALLOW`` and ``BLOCK``. ``ALLOW_WITH_ALERT`` is reserved for forward-compatible
+    reporting or future policy hooks; no alert engine is implemented in this repository.
+    """
+
     ALLOW = "ALLOW"
     BLOCK = "BLOCK"
     ALLOW_WITH_ALERT = "ALLOW_WITH_ALERT"

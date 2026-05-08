@@ -1,0 +1,10 @@
+{
+  "total_scenarios": 3,
+  "matched_expected_count": 3,
+  "match_rate": 1.0,
+  "server_call_block_success_count": 2,
+  "side_effect_block_success_count": 1,
+  "generated_at": "2026-05-06T09:18:55.096266Z",
+  "server_command": "npx -y @modelcontextprotocol/server-filesystem /tmp/rac_fs_demo_87pdjxcx/sandbox",
+  "notes": "RAC v0.6 real filesystem MCP demo (stdio). Match rate assumes identical server binary and RAC_REAL_MCP_SERVER_* env. Blocked-write row expects leak.txt absent after guard."
+}

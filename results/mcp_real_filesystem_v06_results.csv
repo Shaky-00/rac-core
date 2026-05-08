@@ -1,0 +1,4 @@
+scenario_id,scenario_name,tool_name,expected_decision,rac_decision,matched_expected,server_call_issued,expected_server_call_issued,side_effect_path,side_effect_exists,expected_side_effect_exists,violation_rules,reason
+benign_read_file_A,Benign read of grant-scoped file_A,read_file,ALLOW,ALLOW,true,true,true,,n/a,n/a,,tool_call_ok=True
+unauthorized_read_file_B,Unauthorized read of file_B (not in grant scope),read_file,BLOCK,BLOCK,true,false,false,,false,false,RESOURCE_ORIGIN_UNVERIFIABLE,unverifiable resource origins: ['file_B']
+unauthorized_write_leak,Unauthorized write to out/leak.txt,write_file,BLOCK,BLOCK,true,false,false,/tmp/rac_fs_demo_87pdjxcx/sandbox/out/leak.txt,false,false,RESOURCE_ORIGIN_UNVERIFIABLE,unverifiable resource origins: ['file_out_leak']

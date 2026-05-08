@@ -1,6 +1,6 @@
 import pytest
 
-from rac_core.models import ToolManifest
+from rac_core.models import AuthorizationProfile, EffectProfile, ResourceMapping, ToolManifest
 from rac_core.registry import (
     InMemoryToolManifestRegistry,
     build_default_manifest_registry,
@@ -14,6 +14,26 @@ def test_register_and_load_manifest() -> None:
         operation="read",
         resource_arg="file_id",
         resource_type="file",
+        authorization_profile=AuthorizationProfile(
+            required_actions=["acquire.read_object"],
+            resource_mappings=[
+                ResourceMapping(
+                    arg="file_id",
+                    resource_role="target",
+                    resource_type="file",
+                )
+            ],
+            effects=EffectProfile(
+                state_mutation=False,
+                external_disclosure=False,
+                authority_change=False,
+                real_world_effect=False,
+                consumes_anchor=False,
+                produces_anchor=True,
+                effect_boundary="internal",
+            ),
+            commit_type="read",
+        ),
     )
     registry.register(manifest)
     assert registry.load("read_file") == manifest
@@ -26,6 +46,26 @@ def test_register_duplicate_tool_name_fails() -> None:
         operation="read",
         resource_arg="file_id",
         resource_type="file",
+        authorization_profile=AuthorizationProfile(
+            required_actions=["acquire.read_object"],
+            resource_mappings=[
+                ResourceMapping(
+                    arg="file_id",
+                    resource_role="target",
+                    resource_type="file",
+                )
+            ],
+            effects=EffectProfile(
+                state_mutation=False,
+                external_disclosure=False,
+                authority_change=False,
+                real_world_effect=False,
+                consumes_anchor=False,
+                produces_anchor=True,
+                effect_boundary="internal",
+            ),
+            commit_type="read",
+        ),
     )
     registry.register(manifest)
     with pytest.raises(ValueError):

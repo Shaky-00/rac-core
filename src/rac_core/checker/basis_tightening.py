@@ -88,15 +88,20 @@ class BasisTightener:
         new_subjects = {event_subject}
 
         if not self.skip_action_lattice:
-            if not self.action_lattice.is_action_allowed(event.action, inherited_basis.actions):
+            # v0.6: leaf coverage is enforced in PreCommitChecker; do not shrink coarse ``actions``
+            # via ActionLattice when ``required_actions`` is present (avoids false BASIS_EMPTY).
+            if event.required_actions:
+                new_actions = set(inherited_basis.actions)
+            elif not self.action_lattice.is_action_allowed(event.action, inherited_basis.actions):
                 return BasisTighteningResult(
                     valid=False,
                     rule="ACTION_ESCALATION",
                     reason="event action is not allowed by inherited actions",
                 )
-            new_actions = set(inherited_basis.actions).intersection(
-                self.action_lattice.downstream_allowed_actions(event.action)
-            )
+            else:
+                new_actions = set(inherited_basis.actions).intersection(
+                    self.action_lattice.downstream_allowed_actions(event.action)
+                )
         else:
             new_actions = set(inherited_basis.actions)
         if not new_actions:
@@ -149,6 +154,10 @@ class BasisTightener:
             basis_id=new_basis_id,
             subjects=new_subjects,
             actions=new_actions,
+            allowed_action_labels=list(inherited_basis.allowed_action_labels),
+            source_templates=list(inherited_basis.source_templates),
+            compiled_grant_conditions=dict(inherited_basis.compiled_grant_conditions),
+            compiled_grant_delegation=dict(inherited_basis.compiled_grant_delegation),
             resource_scope=BasisResourceScope(
                 type=inherited_basis.resource_scope.type,
                 ids=new_resource_ids,
