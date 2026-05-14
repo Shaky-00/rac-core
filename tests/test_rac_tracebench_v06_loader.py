@@ -50,14 +50,14 @@ def bench_bundle(bench_root):
     return load_rac_tracebench(bench_root)
 
 
-def test_load_thirty_two_traces(bench_bundle) -> None:
-    assert len(bench_bundle["traces"]) == 32
+def test_load_forty_four_traces(bench_bundle) -> None:
+    assert len(bench_bundle["traces"]) == 44
 
 
 def test_load_oracle_labels(bench_bundle) -> None:
     labels = bench_bundle["oracle_labels"]
     assert "labels" in labels
-    assert len(labels["labels"]) == 32
+    assert len(labels["labels"]) == 44
 
 
 def test_oracle_covers_every_trace_id(bench_bundle) -> None:
@@ -77,7 +77,7 @@ def test_violation_expected_block(bench_bundle) -> None:
     by_id = oracle_label_by_trace_id(bench_bundle["oracle_labels"])
     n_allow = sum(1 for r in by_id.values() if r["expected_decision"] == "ALLOW")
     n_block = sum(1 for r in by_id.values() if r["expected_decision"] == "BLOCK")
-    assert n_allow == 5 and n_block == 27
+    assert n_allow == 17 and n_block == 27
 
 
 def test_convert_all_to_controlled_trace(bench_bundle) -> None:
@@ -227,12 +227,12 @@ def test_loader_preserves_observed_access_metadata(bench_bundle) -> None:
 
 def test_load_trace_cases_directory(bench_root) -> None:
     traces = load_trace_cases(bench_root / "controlled_traces" / "paired")
-    assert len(traces) == 32
+    assert len(traces) == 44
 
 
 def test_load_oracle_labels_path(bench_root) -> None:
     doc = load_oracle_labels(bench_root / "oracle_labels" / "paired_oracle_labels.json")
-    assert len(doc["labels"]) == 32
+    assert len(doc["labels"]) == 44
 
 
 def test_trc_v06_011_delegation_only_blocks_full_rac(bench_bundle) -> None:

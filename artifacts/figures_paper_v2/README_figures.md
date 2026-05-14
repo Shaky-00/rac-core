@@ -8,19 +8,8 @@ No overhead rerun; existing `results/rac_tracebench_v06_overhead.csv` was used.
 
 - **Data:** `results/rac_tracebench_v06_summary.json` → `false_negative_by_variant` (missed-block rate).
 - **Fields:** per-variant aggregate false-negative rate over 32 traces; companion table adds `match_rate`, `false_positive`.
-- **Design:** Two visually separated groups (baselines vs RAC_WITHOUT ablations); hatch on ablation bars for B/W distinction.
+- **Design:** Y-axis 0–100% with ticks at 0/25/50/75/100%; thin separator between **Baselines** and **Component ablations** (group names below ticks); short x-labels (`-ResOrig`, `-Anchor`, `-Purpose`, …); hatch on ablation bars; bar labels one decimal (e.g. 84.4%).
 - **Placement:** **Main text** (core controlled evaluation).
-
-### Single-column ACSAC revision — `../figures_paper_rq2/fig_missed_block_rate_compact.*`
-
-- **Script:** `scripts/build_rq2_missed_block_compact.py` (reads the same summary JSON; **does not** alter rates).
-- **Design:** Two **stacked** horizontal-bar panels (baselines above, component ablations below), shared **x** = missed-block rate (%); compact labels; LaTeX snippet `figures_paper_rq2/fig_missed_block_rate_compact.tex`.
-- **Use when:** IEEE/ACSAC **single-column** figure (`[t]` + `\columnwidth`), replacing the older wide vertical-bar `figures_paper_v2/fig_missed_block_rate.*` layout.
-
-### Oracle-BLOCK–normalized (recommended for RQ2 text) — `fig_missed_block_rate_compact_v2.*`
-
-- **Normalization:** Missed-block rate **among oracle-BLOCK traces only** ($n{=}27$): $\text{FN}/27$ with $\text{FN}=\text{false\_negative}\times 32$ (same counts as the suite-wide FN rate on 32 traces).
-- **Files:** `figures_paper_rq2/fig_missed_block_rate_compact_v2.pdf` / `.png`, `fig_missed_block_rate_compact_v2.tex`.
 
 ## Figure B — `fig_overhead_distribution.*`
 

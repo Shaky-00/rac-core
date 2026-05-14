@@ -36,6 +36,8 @@ GROUP1_ORDER = [
     "NO_RAC",
     "ENTRY_ONLY",
     "STATIC_TOOL_ALLOWLIST",
+    "HistoryAware",
+    "Static+History",
 ]
 GROUP2_ORDER = [
     "RAC_WITHOUT_ACTION",
@@ -48,10 +50,12 @@ GROUP2_ORDER = [
 ]
 
 X_LABELS = {
-    "FULL_RAC": "FULL",
-    "NO_RAC": "NO",
-    "ENTRY_ONLY": "Entry",
-    "STATIC_TOOL_ALLOWLIST": "Static",
+    "FULL_RAC": "Full RAC",
+    "NO_RAC": "No RAC",
+    "ENTRY_ONLY": "Entry-only",
+    "STATIC_TOOL_ALLOWLIST": "Static AL",
+    "HistoryAware": "History",
+    "Static+History": "Static+Hist",
     "RAC_WITHOUT_ACTION": "-Act",
     "RAC_WITHOUT_RESOURCE_ORIGIN": "-ResOrig",
     "RAC_WITHOUT_OUTPUT_ANCHOR": "-Anchor",
@@ -183,8 +187,8 @@ def figure_missed_block_rate(summary: dict, plt) -> None:
     xpos = x1 + x2
     sep_x = (x1[-1] + x2[0]) / 2.0 if x1 and x2 else None
 
-    fig_w = 6.8
-    fig, ax = plt.subplots(figsize=(fig_w, 3.05))
+    fig_w = 7.35
+    fig, ax = plt.subplots(figsize=(fig_w, 3.15))
     colors = ["#6e6e6e"] * g1n + ["#9a9a9a"] * g2n
     hatches = [""] * g1n + ["///"] * g2n
     bars = ax.bar(xpos, rates, color=colors, edgecolor="#222222", linewidth=0.65, width=0.72)
@@ -194,6 +198,7 @@ def figure_missed_block_rate(summary: dict, plt) -> None:
 
     ax.set_xticks(xpos)
     ax.set_xticklabels(labels)
+    plt.setp(ax.get_xticklabels(), rotation=42, ha="right", fontsize=7.5)
     ax.set_ylabel("Missed-block rate")
     ax.set_ylim(0, 1.0)
     ax.set_yticks([0.0, 0.25, 0.5, 0.75, 1.0])
@@ -231,7 +236,7 @@ def figure_missed_block_rate(summary: dict, plt) -> None:
             color="#333333",
         )
 
-    fig.tight_layout(rect=[0, 0.12, 1, 1])
+    fig.tight_layout(rect=[0, 0.18, 1, 1])
     _save_figure(fig, FIG_V2 / "fig_missed_block_rate")
 
     # table
@@ -513,7 +518,7 @@ def table_experiment_overview_compact() -> None:
     lines = [
         "| Evaluation | Scale | Main result |",
         "|------------|-------|-------------|",
-        "| Controlled TraceBench | 32 traces × 11 variants | FULL_RAC 32/32, FP=0, FN=0 |",
+        "| Controlled TraceBench | 32 traces × 13 variants | FULL_RAC 32/32, FP=0, FN=0 |",
         "| Ablation | Baselines + 7 component removals | Removing components increases missed-block rate vs FULL |",
         "| Overhead | 100 iterations / 7600 step records | p95 step ≈ 0.219 ms (coarse instrumentation) |",
         "| Real MCP planner | 6 plans / 10 steps per variant (FULL vs NO_RAC) | NO_RAC materializes 2 unauthorized writes; FULL_RAC 0 |",

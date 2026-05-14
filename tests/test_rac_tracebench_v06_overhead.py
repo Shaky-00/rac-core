@@ -42,13 +42,13 @@ SUMMARY_KEYS = {
 
 def test_collect_overhead_small_iterations(bench_root, tmp_path) -> None:
     rows, n_tr = collect_overhead_rows(bench_root, iterations=2)
-    assert n_tr == 32
-    assert len(rows) >= 32 * 2  # at least one row per trace per iteration (early BLOCK may shorten)
+    assert n_tr == 44
+    assert len(rows) >= 44 * 2  # at least one row per trace per iteration (early BLOCK may shorten)
     summary = build_summary(rows, iterations=2, num_traces=n_tr)
     for k in SUMMARY_KEYS:
         assert k in summary
     assert summary["iterations"] == 2
-    assert summary["total_runs"] == 64
+    assert summary["total_runs"] == 88
     assert summary["coarse_grained_measurement_notes"]
     assert "precommit_check_ms" in summary["coarse_grained_measurement_notes"]
 
@@ -67,5 +67,5 @@ def test_write_csv_json_schema(bench_root, tmp_path) -> None:
 def test_run_overhead_and_write_integration(bench_root, tmp_path) -> None:
     csv_p, json_p, summary = run_overhead_and_write(bench_root, tmp_path, iterations=1)
     assert csv_p.is_file() and json_p.is_file()
-    assert summary["num_traces"] == 32
+    assert summary["num_traces"] == 44
 

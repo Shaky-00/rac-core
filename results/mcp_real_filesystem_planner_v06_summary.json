@@ -3,31 +3,54 @@
     "FULL_RAC",
     "NO_RAC"
   ],
-  "total_plans": 6,
-  "total_steps": 20,
+  "total_plans": 14,
+  "total_steps": 58,
   "total_steps_by_variant": {
-    "FULL_RAC": 10,
-    "NO_RAC": 10
+    "FULL_RAC": 29,
+    "NO_RAC": 29
   },
   "match_rate_by_variant": {
     "FULL_RAC": 1.0,
-    "NO_RAC": 0.6
+    "NO_RAC": 0.6896551724137931
   },
   "blocked_steps_by_variant": {
-    "FULL_RAC": 4,
+    "FULL_RAC": 9,
     "NO_RAC": 0
   },
   "server_call_issued_count_by_variant": {
-    "FULL_RAC": 6,
-    "NO_RAC": 10
+    "FULL_RAC": 20,
+    "NO_RAC": 29
   },
   "side_effect_materialized_count_by_variant": {
     "FULL_RAC": 0,
-    "NO_RAC": 2
+    "NO_RAC": 5
   },
-  "full_rac_blocked_side_effects": 2,
-  "no_rac_materialized_side_effects": 2,
-  "generated_at": "2026-05-06T09:19:25.366320Z",
+  "full_rac_blocked_side_effects": 5,
+  "no_rac_materialized_side_effects": 5,
+  "generated_at": "2026-05-09T02:12:18.702218Z",
   "server_command": "npx -y @modelcontextprotocol/server-filesystem <sandbox_root>",
-  "notes": "Deterministic planner JSON → real filesystem MCP (stdio). FULL_RAC uses GuardedRealFilesystemClient; NO_RAC bypasses RAC and calls tools directly. Compare security_violation_materialized and side_effect_exists across variants."
+  "notes": "Deterministic planner JSON → real filesystem MCP (stdio). FULL_RAC uses GuardedRealFilesystemClient; NO_RAC bypasses RAC and calls tools directly. Compare security_violation_materialized and side_effect_exists across variants.",
+  "total_llm_norm_plans": 8,
+  "total_llm_norm_steps": 19,
+  "full_rac_llm_norm_match": 19,
+  "full_rac_llm_norm_stopped": 5,
+  "full_rac_llm_norm_unsafe": 0,
+  "no_rac_llm_norm_match": 14,
+  "no_rac_llm_norm_unsafe": 3,
+  "llm_norm_match_rate_by_variant": {
+    "FULL_RAC": 1.0,
+    "NO_RAC": 0.7368421052631579
+  },
+  "llm_norm_blocked_steps_by_variant": {
+    "FULL_RAC": 5,
+    "NO_RAC": 0
+  },
+  "llm_norm_server_call_issued_count_by_variant": {
+    "FULL_RAC": 14,
+    "NO_RAC": 19
+  },
+  "llm_norm_side_effect_materialized_count_by_variant": {
+    "FULL_RAC": 0,
+    "NO_RAC": 3
+  }
 }

@@ -14,6 +14,10 @@ Example:
 Artifacts (default ``--output-dir`` = repository ``results/``):
   mcp_real_filesystem_planner_v06_results.csv
   mcp_real_filesystem_planner_v06_summary.json
+
+Plans are loaded from ``examples/mcp_real_filesystem_v06/plans/*.json`` (sorted glob), including
+hand-authored plans and ``llm_norm_*.json`` after ``normalize_deepseek_planner_plans.py``. Replay
+does not call DeepSeek or any LLM API.
 """
 
 from __future__ import annotations

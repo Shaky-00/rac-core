@@ -29,6 +29,13 @@ from rac_core.verification import (
 )
 from rac_core.verification.output_anchor import output_anchor_integrity_precheck
 
+from .history_aware_scope import (
+    HistoryAwareState,
+    grant_bound_resource_ids_for_trace,
+    history_aware_scope_step,
+    static_history_aware_step,
+    tracebench_static_tool_allowlist_decision_if_denied,
+)
 from .trace import (
     ControlledTrace,
     TraceStep,
@@ -38,20 +45,13 @@ from .trace import (
 )
 
 
-def _skip_output_anchor_integrity(mode: AblationMode) -> bool:
-    """Output-anchor observed_access gate is off for anchor-free and static-allowlist baselines."""
-    return mode in (
-        AblationMode.RAC_WITHOUT_ANCHOR,
-        AblationMode.STATIC_TOOL_ALLOWLIST,
-        AblationMode.NO_RAC,
-    )
-
-
 class AblationMode(str, Enum):
     FULL_RAC = "FULL_RAC"
     NO_RAC = "NO_RAC"
     ENTRY_ONLY_CHECK = "ENTRY_ONLY_CHECK"
     STATIC_TOOL_ALLOWLIST = "STATIC_TOOL_ALLOWLIST"
+    HISTORY_AWARE_SCOPE = "HISTORY_AWARE_SCOPE"
+    STATIC_HISTORY_AWARE = "STATIC_HISTORY_AWARE"
     RAC_WITHOUT_LINEAGE = "RAC_WITHOUT_LINEAGE"
     RAC_WITHOUT_RESOURCE_ORIGIN = "RAC_WITHOUT_RESOURCE_ORIGIN"
     RAC_WITHOUT_PURPOSE = "RAC_WITHOUT_PURPOSE"
@@ -71,6 +71,17 @@ COMPONENT_ABLATION_MODES: tuple[AblationMode, ...] = (
     AblationMode.RAC_WITHOUT_DELEGATION,
     AblationMode.RAC_WITHOUT_ANCHOR,
 )
+
+
+def _skip_output_anchor_integrity(mode: AblationMode) -> bool:
+    """Output-anchor observed_access gate is off for anchor-free and static-allowlist baselines."""
+    return mode in (
+        AblationMode.RAC_WITHOUT_ANCHOR,
+        AblationMode.STATIC_TOOL_ALLOWLIST,
+        AblationMode.NO_RAC,
+        AblationMode.HISTORY_AWARE_SCOPE,
+        AblationMode.STATIC_HISTORY_AWARE,
+    )
 
 
 class _NoOpResourceOriginVerifier(ResourceOriginVerifier):
@@ -132,6 +143,10 @@ class AblationRunner:
         if mode == AblationMode.NO_RAC:
             return None
         if mode == AblationMode.STATIC_TOOL_ALLOWLIST:
+            return None
+        if mode == AblationMode.HISTORY_AWARE_SCOPE:
+            return None
+        if mode == AblationMode.STATIC_HISTORY_AWARE:
             return None
         reg = self._sem()
         if mode == AblationMode.RAC_WITHOUT_RESOURCE_ORIGIN:
@@ -218,6 +233,12 @@ class AblationRunner:
         step_results: list[AblationStepResult] = []
         blocked_at_step: str | None = None
 
+        history_state: HistoryAwareState | None = None
+        if mode in (AblationMode.HISTORY_AWARE_SCOPE, AblationMode.STATIC_HISTORY_AWARE):
+            history_state = HistoryAwareState(
+                grant_resource_ids=grant_bound_resource_ids_for_trace(trace),
+            )
+
         first_ib: AuthorizationBasis | None = None
         if checker is not None and not trace.legacy_rac_trace:
             if trace.initial_basis is not None:
@@ -234,6 +255,7 @@ class AblationRunner:
                 step=step,
                 checker=checker,
                 trace_initial_basis=first_ib,
+                history_state=history_state,
             )
             observed_rules = [v.rule for v in decision.violations]
             oracle = step.expected_decision
@@ -284,6 +306,7 @@ class AblationRunner:
         step: TraceStep,
         checker: RACPreCommitChecker | None,
         trace_initial_basis: AuthorizationBasis | None = None,
+        history_state: HistoryAwareState | None = None,
     ) -> Decision:
         if mode == AblationMode.NO_RAC:
             if not step.local_allow:
@@ -303,29 +326,11 @@ class AblationRunner:
             )
 
         if mode == AblationMode.STATIC_TOOL_ALLOWLIST:
-            ev = effective_event_for_trace_step(step)
-            # Baseline heuristic: paired TraceBench seed uses read + summarize only. Violation traces
-            # may add other tools (email, merge, sub-agent, …); those are denied here to surface the
-            # limits of a static tool allowlist without grant-template expansion.
-            allowlist = frozenset({"read_file", "summarize_file"})
-            if ev.tool_name not in allowlist:
-                return Decision(
-                    decision=DecisionType.BLOCK,
-                    violations=[
-                        Violation(
-                            rule="STATIC_TOOL_ALLOWLIST_DENY",
-                            reason=(
-                                f"tool_name={ev.tool_name!r} not in static allowlist {sorted(allowlist)} "
-                                "(TraceBench baseline heuristic; does not use grant_templates)."
-                            ),
-                        )
-                    ],
-                    metadata={
-                        "ablation_mode": mode.value,
-                        "baseline": "static_tool_allowlist",
-                        "output_anchor_integrity_check": "skipped_by_baseline",
-                    },
-                )
+            d = tracebench_static_tool_allowlist_decision_if_denied(
+                step, ablation_mode_value=mode.value
+            )
+            if d is not None:
+                return d
             return Decision(
                 decision=DecisionType.ALLOW,
                 metadata={
@@ -334,6 +339,16 @@ class AblationRunner:
                     "output_anchor_integrity_check": "skipped_by_baseline",
                 },
             )
+
+        if mode == AblationMode.HISTORY_AWARE_SCOPE:
+            if history_state is None:
+                raise ValueError("HISTORY_AWARE_SCOPE requires history_state")
+            return history_aware_scope_step(step, history_state)
+
+        if mode == AblationMode.STATIC_HISTORY_AWARE:
+            if history_state is None:
+                raise ValueError("STATIC_HISTORY_AWARE requires history_state")
+            return static_history_aware_step(step, history_state)
 
         if mode == AblationMode.ENTRY_ONLY_CHECK and step_index > 0:
             if not step.local_allow:

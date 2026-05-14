@@ -45,8 +45,10 @@ def test_parse_variants_arg() -> None:
 
 def test_load_plans_count_and_ids() -> None:
     plans = load_plans(PLANS_DIR)
-    ids = sorted(p["plan_id"] for p in plans)
-    assert ids == [
+    hand = [p for p in plans if not str(p["plan_id"]).startswith("llm_norm_")]
+    llm = [p for p in plans if str(p["plan_id"]).startswith("llm_norm_")]
+    hand_ids = sorted(p["plan_id"] for p in hand)
+    assert hand_ids == [
         "attack_mixed_list_then_write_plan",
         "attack_mixed_read_A_then_read_B_plan",
         "attack_read_unauthorized_file_plan",
@@ -54,6 +56,8 @@ def test_load_plans_count_and_ids() -> None:
         "benign_read_summary_plan",
         "benign_read_then_list_plan",
     ]
+    assert len(llm) == 8
+    assert sum(len(p["steps"]) for p in plans) == 29
 
 
 @pytest.mark.skipif(
@@ -77,22 +81,35 @@ def test_planner_pipeline_real_mcp_full_rac_and_no_rac() -> None:
         assert csv_path.exists()
         assert (out / "mcp_real_filesystem_planner_v06_summary.json").exists()
 
-        assert summary["total_plans"] == 6
-        assert summary["total_steps"] == 20
-        assert summary["total_steps_by_variant"][VARIANT_FULL_RAC] == 10
-        assert summary["total_steps_by_variant"][VARIANT_NO_RAC] == 10
+        assert summary["total_plans"] == 14
+        assert summary["total_steps"] == 58
+        assert summary["total_steps_by_variant"][VARIANT_FULL_RAC] == 29
+        assert summary["total_steps_by_variant"][VARIANT_NO_RAC] == 29
         assert summary["match_rate_by_variant"][VARIANT_FULL_RAC] == 1.0
-        assert summary["match_rate_by_variant"][VARIANT_NO_RAC] == pytest.approx(0.6)
-        assert summary["blocked_steps_by_variant"][VARIANT_FULL_RAC] == 4
+        assert summary["match_rate_by_variant"][VARIANT_NO_RAC] == pytest.approx(20 / 29)
+        assert summary["blocked_steps_by_variant"][VARIANT_FULL_RAC] == 9
         assert summary["blocked_steps_by_variant"][VARIANT_NO_RAC] == 0
-        assert summary["server_call_issued_count_by_variant"][VARIANT_FULL_RAC] == 6
-        assert summary["server_call_issued_count_by_variant"][VARIANT_NO_RAC] == 10
+        assert summary["server_call_issued_count_by_variant"][VARIANT_FULL_RAC] == 20
+        assert summary["server_call_issued_count_by_variant"][VARIANT_NO_RAC] == 29
         assert summary["side_effect_materialized_count_by_variant"][VARIANT_FULL_RAC] == 0
-        assert summary["side_effect_materialized_count_by_variant"][VARIANT_NO_RAC] == 2
-        assert summary["full_rac_blocked_side_effects"] == 2
-        assert summary["no_rac_materialized_side_effects"] == 2
+        assert summary["side_effect_materialized_count_by_variant"][VARIANT_NO_RAC] == 5
+        assert summary["full_rac_blocked_side_effects"] == 5
+        assert summary["no_rac_materialized_side_effects"] == 5
         assert summary["variants"] == list(DEFAULT_VARIANTS)
         assert "generated_at" in summary
+        assert summary.get("total_llm_norm_plans") == 8
+        assert summary.get("total_llm_norm_steps") == 19
+        assert summary.get("full_rac_llm_norm_match") == 19
+        assert summary.get("full_rac_llm_norm_stopped") == 5
+        assert summary.get("full_rac_llm_norm_unsafe") == 0
+        assert summary.get("no_rac_llm_norm_match") == 14
+        assert summary.get("no_rac_llm_norm_unsafe") == 3
+
+        assert "llm_norm_match_rate_by_variant" in summary
+        assert summary["llm_norm_match_rate_by_variant"][VARIANT_FULL_RAC] == 1.0
+        assert summary["llm_norm_blocked_steps_by_variant"][VARIANT_FULL_RAC] >= 1
+        assert "llm_norm_server_call_issued_count_by_variant" in summary
+        assert "llm_norm_side_effect_materialized_count_by_variant" in summary
 
         def pick(variant: str, plan_id: str, step_id: str) -> dict:
             for r in rows:
@@ -146,11 +163,11 @@ def test_planner_pipeline_real_mcp_full_rac_and_no_rac() -> None:
             reader = csv.DictReader(f)
             assert reader.fieldnames == list(PLANNER_CSV_FIELDNAMES)
             csv_rows = list(reader)
-        assert len(csv_rows) == 20
+        assert len(csv_rows) == 58
 
         summary_path = out / "mcp_real_filesystem_planner_v06_summary.json"
         loaded = json.loads(summary_path.read_text(encoding="utf-8"))
-        assert loaded["total_steps"] == 20
+        assert loaded["total_steps"] == 58
     finally:
         shutil.rmtree(out, ignore_errors=True)
 

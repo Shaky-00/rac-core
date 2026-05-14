@@ -4,6 +4,8 @@
 | `NO_RAC` | 0.84375 | 0.15625 | 0.0 |
 | `ENTRY_ONLY` | 0.75 | 0.25 | 0.0 |
 | `STATIC_TOOL_ALLOWLIST` | 0.59375 | 0.40625 | 0.0 |
+| `HistoryAware` | 0.6875 | 0.3125 | 0.0 |
+| `Static+History` | 0.4375 | 0.5625 | 0.0 |
 | `RAC_WITHOUT_ACTION` | 0.09375 | 0.90625 | 0.0 |
 | `RAC_WITHOUT_RESOURCE_ORIGIN` | 0.125 | 0.875 | 0.0 |
 | `RAC_WITHOUT_OUTPUT_ANCHOR` | 0.09375 | 0.90625 | 0.0 |

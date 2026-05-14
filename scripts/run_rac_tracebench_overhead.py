@@ -33,7 +33,7 @@ def main() -> None:
         "--iterations",
         type=int,
         default=100,
-        help="Number of full passes over all 32 traces (default: 100)",
+        help="Number of full passes over all TraceBench traces (default: 100)",
     )
     p.add_argument(
         "--output-dir",

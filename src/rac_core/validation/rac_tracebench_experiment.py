@@ -48,6 +48,8 @@ def default_variant_plan() -> list[tuple[str, AblationMode]]:
         ("NO_RAC", AblationMode.NO_RAC),
         ("ENTRY_ONLY", AblationMode.ENTRY_ONLY_CHECK),
         ("STATIC_TOOL_ALLOWLIST", AblationMode.STATIC_TOOL_ALLOWLIST),
+        ("HistoryAware", AblationMode.HISTORY_AWARE_SCOPE),
+        ("Static+History", AblationMode.STATIC_HISTORY_AWARE),
         ("RAC_WITHOUT_ACTION", AblationMode.RAC_WITHOUT_ACTION),
         ("RAC_WITHOUT_RESOURCE_ORIGIN", AblationMode.RAC_WITHOUT_RESOURCE_ORIGIN),
         ("RAC_WITHOUT_OUTPUT_ANCHOR", AblationMode.RAC_WITHOUT_ANCHOR),
@@ -189,6 +191,75 @@ def build_experiment_rows(
     return rows, summary
 
 
+def _build_benign_suite_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Per-variant benign false-positive stats: oracle ALLOW traces incorrectly blocked."""
+    variants = sorted({str(r["variant"]) for r in rows})
+    oracle_allow_ids: list[str] = []
+    seen: set[str] = set()
+    for r in rows:
+        tid = str(r["trace_id"])
+        if str(r["oracle_expected_decision"]) == "ALLOW" and tid not in seen:
+            seen.add(tid)
+            oracle_allow_ids.append(tid)
+    n = len(oracle_allow_ids)
+    by_variant: dict[str, dict[str, Any]] = {}
+    for v in variants:
+        blocked = 0
+        admitted = 0
+        for tid in oracle_allow_ids:
+            row = next(x for x in rows if str(x["variant"]) == v and str(x["trace_id"]) == tid)
+            if str(row["replay_decision"]) == "BLOCK":
+                blocked += 1
+            else:
+                admitted += 1
+        by_variant[v] = {
+            "total_benign_oracle_allow_traces": n,
+            "admitted_benign": admitted,
+            "blocked_benign_false_positives": blocked,
+            "benign_false_positive_rate": (blocked / n) if n else 0.0,
+        }
+    return {
+        "description": (
+            "Benign false-positive analysis over traces with oracle_expected_decision ALLOW. "
+            "blocked_benign_false_positives counts oracle-ALLOW traces where replay_decision is BLOCK."
+        ),
+        "total_benign_traces": n,
+        "by_variant": by_variant,
+    }
+
+
+def write_benign_suite_summary_files(benign_summary: dict[str, Any], out_dir: Path) -> tuple[Path, Path]:
+    """Write ``rac_tracebench_v06_benign_summary.{json,csv}`` (separate from oracle-BLOCK missed-block metrics)."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    json_path = out_dir / "rac_tracebench_v06_benign_summary.json"
+    json_path.write_text(json.dumps(benign_summary, indent=2, sort_keys=True), encoding="utf-8")
+    csv_path = out_dir / "rac_tracebench_v06_benign_summary.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(
+            [
+                "variant",
+                "total_benign_traces",
+                "admitted_benign",
+                "blocked_benign_false_positives",
+                "benign_false_positive_rate",
+            ]
+        )
+        n_tot = int(benign_summary["total_benign_traces"])
+        for v in sorted((benign_summary.get("by_variant") or {}).keys()):
+            d = benign_summary["by_variant"][v]
+            w.writerow(
+                [
+                    v,
+                    n_tot,
+                    d["admitted_benign"],
+                    d["blocked_benign_false_positives"],
+                    f"{float(d['benign_false_positive_rate']):.8f}",
+                ]
+            )
+    return csv_path, json_path
+
+
 def _build_summary(
     rows: list[dict[str, Any]],
     plan: list[tuple[str, AblationMode]],
@@ -259,6 +330,7 @@ def _build_summary(
         "false_negative_by_variant": false_negative_by_variant,
         "block_rate_by_variant": block_rate_by_variant,
         "per_family_results": dict(per_family),
+        "benign_suite_summary": _build_benign_suite_summary(rows),
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "static_tool_allowlist_note": (
             "STATIC_TOOL_ALLOWLIST uses a fixed {read_file, summarize_file} allowlist baseline heuristic "
@@ -320,4 +392,7 @@ def run_and_write(
     json_path = out / json_name
     write_tracebench_experiment_csv(rows, csv_path)
     write_tracebench_experiment_summary(summary, json_path)
+    benign = summary.get("benign_suite_summary")
+    if isinstance(benign, dict):
+        write_benign_suite_summary_files(benign, out)
     return csv_path, json_path

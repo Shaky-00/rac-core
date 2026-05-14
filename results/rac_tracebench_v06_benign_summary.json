@@ -1,0 +1,84 @@
+{
+  "by_variant": {
+    "ENTRY_ONLY": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "FULL_RAC": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "HistoryAware": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "NO_RAC": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "RAC_WITHOUT_ACTION": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "RAC_WITHOUT_CONDITION": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "RAC_WITHOUT_DELEGATION": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "RAC_WITHOUT_LINEAGE": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "RAC_WITHOUT_OUTPUT_ANCHOR": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "RAC_WITHOUT_PURPOSE": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "RAC_WITHOUT_RESOURCE_ORIGIN": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "STATIC_TOOL_ALLOWLIST": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    },
+    "Static+History": {
+      "admitted_benign": 17,
+      "benign_false_positive_rate": 0.0,
+      "blocked_benign_false_positives": 0,
+      "total_benign_oracle_allow_traces": 17
+    }
+  },
+  "description": "Benign false-positive analysis over traces with oracle_expected_decision ALLOW. blocked_benign_false_positives counts oracle-ALLOW traces where replay_decision is BLOCK.",
+  "total_benign_traces": 17
+}

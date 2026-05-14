@@ -66,6 +66,8 @@ def bench_root():
 def test_experiment_writes_csv_and_json(bench_root, tmp_path) -> None:
     csv_p, json_p = run_and_write(root=bench_root, output_dir=tmp_path)
     assert csv_p.is_file() and json_p.is_file()
+    assert (tmp_path / "rac_tracebench_v06_benign_summary.json").is_file()
+    assert (tmp_path / "rac_tracebench_v06_benign_summary.csv").is_file()
     text = csv_p.read_text(encoding="utf-8")
     header = text.splitlines()[0]
     for col in CSV_FIELDNAMES:
@@ -74,21 +76,29 @@ def test_experiment_writes_csv_and_json(bench_root, tmp_path) -> None:
     assert "match_rate_by_variant" in summary
     assert "supported_variants" in summary
     assert "STATIC_TOOL_ALLOWLIST" in summary["supported_variants"]
-    assert summary["total_traces"] == 32
+    assert "HistoryAware" in summary["supported_variants"]
+    assert "Static+History" in summary["supported_variants"]
+    assert summary["total_traces"] == 44
     assert "FULL_RAC" in summary["variants"]
     assert summary.get("unsupported_variants") == []
 
 
 def test_full_rac_matches_oracle_all_traces(bench_root) -> None:
-    rows, _summary = build_experiment_rows(root=bench_root)
+    rows, summary = build_experiment_rows(root=bench_root)
     full = [r for r in rows if r["variant"] == "FULL_RAC"]
-    assert len(full) == 32
+    assert len(full) == 44
     assert all(r["matched_oracle"] == "true" for r in full)
+    bs = summary.get("benign_suite_summary")
+    assert isinstance(bs, dict)
+    assert bs["total_benign_traces"] == 17
+    full_b = bs["by_variant"]["FULL_RAC"]
+    assert full_b["blocked_benign_false_positives"] == 0
+    assert full_b["benign_false_positive_rate"] == 0.0
 
 
 def test_csv_row_count(bench_root) -> None:
     rows, _ = build_experiment_rows(root=bench_root)
-    assert len(rows) == 32 * 11
+    assert len(rows) == 44 * 13
 
 
 def test_rac_without_output_anchor_differs_from_full_on_008(bench_root) -> None:
@@ -147,3 +157,4 @@ def test_summary_false_positive_rates_defined(bench_root) -> None:
     assert "false_negative_by_variant" in summary
     assert "block_rate_by_variant" in summary
     assert isinstance(summary["per_family_results"], dict)
+    assert "benign_suite_summary" in summary
