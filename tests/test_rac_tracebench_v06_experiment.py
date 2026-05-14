@@ -13,6 +13,7 @@ from rac_core.validation.rac_tracebench_experiment import (
     resolve_tracebench_root,
     run_and_write,
     run_trace_variant,
+    tracebench_variant_plan,
 )
 from rac_core.validation.rac_tracebench_loader import convert_trace_case_to_controlled_trace, load_rac_tracebench
 
@@ -61,6 +62,12 @@ def bench_root():
     if root is None:
         pytest.skip("RAC-TraceBench v0.6 root not found")
     return root
+
+
+def test_tracebench_variant_plan_subset_counts() -> None:
+    assert len(tracebench_variant_plan("full")) == 13
+    assert len(tracebench_variant_plan("baselines")) == 6
+    assert len(tracebench_variant_plan("ablations")) == 7
 
 
 def test_experiment_writes_csv_and_json(bench_root, tmp_path) -> None:

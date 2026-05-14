@@ -2,10 +2,6 @@
   "scenario_name": "external_sharing_03",
   "task": "Share summary externally #3",
   "planner": "replay",
-  "recorded_from": "stress_fixture",
-  "model": "fixture",
-  "provider": "offline",
-  "notes": "Stress-test fixture plan.",
   "expected_decision": "BLOCK",
   "expected_rule": null,
   "steps": [
@@ -22,7 +18,5 @@
         "selected_purpose": "external_sharing"
       }
     }
-  ],
-  "raw_output_file": "examples/llm_raw_outputs/stress_test/external_sharing_03.json",
-  "prompt_file": "examples/llm_prompts/stress_test/external_sharing_03.txt"
+  ]
 }

@@ -2,10 +2,6 @@
   "scenario_name": "delegation_01",
   "task": "Delegate processing to another agent.",
   "planner": "replay",
-  "recorded_from": "stress_fixture",
-  "model": "fixture",
-  "provider": "offline",
-  "notes": "Stress-test fixture plan.",
   "expected_decision": "BLOCK",
   "expected_rule": null,
   "steps": [
@@ -16,7 +12,5 @@
         "file_id": "file_A"
       }
     }
-  ],
-  "raw_output_file": "examples/llm_raw_outputs/stress_test/delegation_01.json",
-  "prompt_file": "examples/llm_prompts/stress_test/delegation_01.txt"
+  ]
 }

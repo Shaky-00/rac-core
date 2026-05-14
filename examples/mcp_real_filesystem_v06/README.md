@@ -10,9 +10,9 @@ python3 examples/mcp_real_filesystem_v06/run_real_filesystem_case.py
 
 The script creates a temp sandbox, appends its path as the last server argv token, runs benign read / blocked read / blocked write, and writes `traces/mcp_real_filesystem_v06_trace.jsonl`.
 
-Results (default `--output-dir` = repo `results/`):
+Results (default ``--output-dir`` = ``artifacts/results/``):
 
 - `mcp_real_filesystem_v06_results.csv`
 - `mcp_real_filesystem_v06_summary.json`
 
-Or: `python3 scripts/run_mcp_real_filesystem_v06.py` (same CLI).
+Or: `python3 scripts/paper_optional/run_mcp_real_filesystem_v06.py` (same CLI).

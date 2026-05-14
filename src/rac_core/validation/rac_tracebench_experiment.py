@@ -34,11 +34,7 @@ def resolve_tracebench_root(explicit: Path | None = None) -> Path | None:
         p = Path(env).expanduser().resolve()
         if (p / "controlled_traces" / "paired").is_dir():
             return p
-    r = resolve_rac_tracebench_root()
-    if r is not None:
-        return r
-    fallback = Path("/root/projects/mcp_data/rac_tracebench_v06")
-    return fallback if (fallback / "controlled_traces" / "paired").is_dir() else None
+    return resolve_rac_tracebench_root()
 
 
 def default_variant_plan() -> list[tuple[str, AblationMode]]:
@@ -58,6 +54,30 @@ def default_variant_plan() -> list[tuple[str, AblationMode]]:
         ("RAC_WITHOUT_CONDITION", AblationMode.RAC_WITHOUT_CONDITIONS),
         ("RAC_WITHOUT_DELEGATION", AblationMode.RAC_WITHOUT_DELEGATION),
     ]
+
+_TRACE_BENCH_BASELINE_NAMES = frozenset(
+    {
+        "FULL_RAC",
+        "NO_RAC",
+        "ENTRY_ONLY",
+        "STATIC_TOOL_ALLOWLIST",
+        "HistoryAware",
+        "Static+History",
+    }
+)
+
+
+def tracebench_variant_plan(group: str) -> list[tuple[str, AblationMode]]:
+    """Subset of :func:`default_variant_plan` for RQ2-style runs (same replay semantics per variant)."""
+    plan = default_variant_plan()
+    g = (group or "all").strip().lower()
+    if g in ("all", "full"):
+        return plan
+    if g in ("baselines", "baseline"):
+        return [(v, m) for v, m in plan if v in _TRACE_BENCH_BASELINE_NAMES]
+    if g in ("ablations", "ablation", "rac_without"):
+        return [(v, m) for v, m in plan if v.startswith("RAC_WITHOUT_")]
+    raise ValueError(f"unknown variant group: {group!r}")
 
 
 def _checker_factory() -> RACPreCommitChecker:
@@ -377,17 +397,19 @@ def run_and_write(
     *,
     root: Path | None = None,
     output_dir: Path | None = None,
+    variant_plan: list[tuple[str, AblationMode]] | None = None,
     csv_name: str = "rac_tracebench_v06_results.csv",
     json_name: str = "rac_tracebench_v06_summary.json",
 ) -> tuple[Path, Path]:
     r = resolve_tracebench_root(root)
     if r is None:
         raise FileNotFoundError(
-            "RAC-TraceBench root not found. Set RAC_TRACEBENCH_ROOT or place mcp_data/rac_tracebench_v06."
+            "RAC-TraceBench root not found. Set RAC_TRACEBENCH_ROOT or place the bundle under "
+            "data/tracebench/rac_tracebench_v06/ or mcp_data/rac_tracebench_v06/ next to the repository."
         )
     out = output_dir or Path("results")
     out = out.expanduser().resolve()
-    rows, summary = build_experiment_rows(root=r)
+    rows, summary = build_experiment_rows(root=r, variant_plan=variant_plan)
     csv_path = out / csv_name
     json_path = out / json_name
     write_tracebench_experiment_csv(rows, csv_path)

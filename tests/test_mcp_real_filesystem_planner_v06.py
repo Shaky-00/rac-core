@@ -12,6 +12,8 @@ import pytest
 
 pytest.importorskip("mcp")
 
+pytestmark = pytest.mark.optional
+
 from examples.mcp_real_filesystem_v06.planner_results_export import PLANNER_CSV_FIELDNAMES
 from examples.mcp_real_filesystem_v06.planner_runner import (
     DEFAULT_VARIANTS,

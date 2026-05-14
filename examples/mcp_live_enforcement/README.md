@@ -51,7 +51,7 @@ If your environment already has `mcp` installed (for example from `examples/mcp_
 Outputs:
 
 - `examples/mcp_live_enforcement/traces/mcp_guarded_trace.jsonl`
-- `examples/mcp_live_enforcement/results/mcp_case_study_results.json`
+- `examples/mcp_live_enforcement/case_outputs/mcp_case_study_results.json`
 
 ## Evidence for pre-call enforcement
 
@@ -62,8 +62,8 @@ A blocked step must satisfy both:
 
 ## Current scope and next step
 
-- Current scope: scripted scenarios only (no live LLM planner).
-- Next step: plug planner-generated pending calls into the same guarded client + AEM interface without changing RAC core checker logic.
+- Current scope: scripted scenarios only (deterministic pending calls).
+- Extensions should route additional pending-call sources through the same guarded client + AEM surface without changing RAC core checker logic.
 
 ## Structured content note
 

@@ -18,17 +18,13 @@ class LLMPlanStep(BaseModel):
 
 
 class LLMPlanFixture(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    """Normalized deterministic planner-style fixture (replay-only; no live model calls)."""
+
+    model_config = ConfigDict(extra="ignore")
 
     scenario_name: str = Field(min_length=1)
     task: str = Field(min_length=1)
     planner: str = "replay"
-    recorded_from: str | None = None
-    model: str | None = None
-    provider: str | None = None
-    raw_output_file: str | None = None
-    prompt_file: str | None = None
-    notes: str | None = None
     expected_decision: DecisionType | None = None
     expected_rule: str | None = None
     steps: list[LLMPlanStep] = Field(default_factory=list)
@@ -46,7 +42,7 @@ class LLMPlanFixture(BaseModel):
 
 
 class ReplayLLMPlanner:
-    """Replays recorded LLM tool plans from JSON; no live LLM, no authorization logic."""
+    """Replays normalized planner-style tool plans from JSON fixtures; no live model calls."""
 
     def __init__(self, fixture_dir: str | Path) -> None:
         self.fixture_dir = Path(fixture_dir)
@@ -80,7 +76,7 @@ class ReplayLLMPlanner:
 
 
 def run_replay_llm_scenario(scenario_name: str, fixture_dir: str | Path) -> DemoRunResult:
-    """Run one replayed LLM plan through LocalRACController (same grants as Stage 7 demo)."""
+    """Run one replayed planner-style plan through LocalRACController (same grants as Stage 7 demo)."""
     from rac_core.demo.reporting import make_demo_controller_for_scenario
 
     planner = ReplayLLMPlanner(fixture_dir)

@@ -1,0 +1,192 @@
+{
+  "samples": [
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": null,
+        "repeat": 0,
+        "resolution_note": "single_predecessor_allow"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 1,
+      "scenario": "predecessor_resolution_n1",
+      "total_ms": 0.477871,
+      "workflow_length": null
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": null,
+        "repeat": 1,
+        "resolution_note": "single_predecessor_allow"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 1,
+      "scenario": "predecessor_resolution_n1",
+      "total_ms": 0.518102,
+      "workflow_length": null
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": null,
+        "repeat": 2,
+        "resolution_note": "single_predecessor_allow"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 1,
+      "scenario": "predecessor_resolution_n1",
+      "total_ms": 0.443881,
+      "workflow_length": null
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": null,
+        "repeat": 3,
+        "resolution_note": "single_predecessor_allow"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 1,
+      "scenario": "predecessor_resolution_n1",
+      "total_ms": 0.485458,
+      "workflow_length": null
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": null,
+        "repeat": 4,
+        "resolution_note": "single_predecessor_allow"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 1,
+      "scenario": "predecessor_resolution_n1",
+      "total_ms": 0.509112,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": "EVENT_CONSTRUCTION_ERROR",
+        "repeat": 0,
+        "resolution_note": "multi_anchor_event_construction"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 2,
+      "scenario": "predecessor_resolution_n2",
+      "total_ms": 0.483427,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": "EVENT_CONSTRUCTION_ERROR",
+        "repeat": 1,
+        "resolution_note": "multi_anchor_event_construction"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 2,
+      "scenario": "predecessor_resolution_n2",
+      "total_ms": 0.735135,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": "EVENT_CONSTRUCTION_ERROR",
+        "repeat": 2,
+        "resolution_note": "multi_anchor_event_construction"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 2,
+      "scenario": "predecessor_resolution_n2",
+      "total_ms": 0.473771,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": "EVENT_CONSTRUCTION_ERROR",
+        "repeat": 3,
+        "resolution_note": "multi_anchor_event_construction"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 2,
+      "scenario": "predecessor_resolution_n2",
+      "total_ms": 0.556603,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "blocked_rule": "EVENT_CONSTRUCTION_ERROR",
+        "repeat": 4,
+        "resolution_note": "multi_anchor_event_construction"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": 2,
+      "scenario": "predecessor_resolution_n2",
+      "total_ms": 0.458072,
+      "workflow_length": null
+    }
+  ],
+  "summaries": [
+    {
+      "max_ms": 0.518102,
+      "mean_ms": 0.4868848,
+      "median_ms": 0.485458,
+      "metadata": {
+        "predecessor_count": 1
+      },
+      "min_ms": 0.443881,
+      "n": 5,
+      "p95_ms": 0.516304,
+      "p99_ms": 0.5177423999999999,
+      "scenario": "predecessor_resolution_n1"
+    },
+    {
+      "max_ms": 0.735135,
+      "mean_ms": 0.5414015999999999,
+      "median_ms": 0.483427,
+      "metadata": {
+        "predecessor_count": 2
+      },
+      "min_ms": 0.458072,
+      "n": 5,
+      "p95_ms": 0.6994286,
+      "p99_ms": 0.72799372,
+      "scenario": "predecessor_resolution_n2"
+    }
+  ]
+}

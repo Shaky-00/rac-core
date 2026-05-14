@@ -1,64 +1,50 @@
-# rac-core
+# RAC-Core — minimal anonymous artifact
 
-**Runtime Authorization Consistency (RAC)** — reference **v0.6 prototype** implementation for research and evaluation.
+**Runtime Authorization Consistency (RAC) v0.6** prototype: a controller-side **pre-commit** checker over typed authorization events for MCP-shaped agentic workflows (manifests/grants, lineage, optional output anchors).
 
-This repository tracks a **controller-side pre-commit checker** over typed authorization events, trusted manifests/grants, causal lineage, and optional structured output anchors. The normative Chinese spec is **`RAC_技术规格_v0.6.md`** (e.g. your ACSAC `tech_spec` tree); you may **copy** it into `docs/RAC_技术规格_v0.6.md` for a repo-local citation. Implementation-to-design mapping and **documented gaps** vs that spec live in [`docs/rac_v06_alignment.md`](docs/rac_v06_alignment.md).
+This repository is a **slim anonymous artifact**: it does **not** ship historical static figures, large raw logs, or a top-level experiment export tree named `results`. Reviewers reproduce metrics by **running** the bundled scripts; a few **reference JSON summaries** live under `artifacts/expected/summaries/` for optional diffing.
 
-Per v0.6, the bundled YAML action configuration is **Reference Action Semantics** (not a universal threat taxonomy). Evaluation traces under `validation/taxonomy_traces.py` are for **coverage organization**; the checker implements **NoMorePermissive**-style rules, not taxonomy-as-target detection.
+## Layout
 
-## Core entry points
+| Path | Role |
+|------|------|
+| `src/rac_core/` | Checker, adapter, stores, validation, evaluation |
+| `tests/` | Core tests; `pytest -m optional` enables MCP demo / stress corpora tests |
+| `scripts/*.sh`, `scripts/run_*.py` | **Minimal reproduction** entry points |
+| `scripts/paper_optional/` | Optional helpers to regenerate tables or figures from summaries (matplotlib; not required for evaluation) |
+| `data/` | Install location for the RAC-TraceBench v0.6 JSON bundle (`data/README.md`) |
+| `artifacts/results/` | **Runtime outputs** (gitignored except `.gitkeep`) |
+| `artifacts/expected/summaries/` | Small reference **JSON** snapshots |
+| `artifacts/expected/data/` | Optional small auxiliary files (see `.gitignore` allowlist) |
+| `artifacts/generated/` | Outputs from `scripts/paper_optional/` (gitignored) |
+| `examples/` | MCP demos; normalized planner-style replay fixtures under `examples/llm_plans/`; `mcp_live_enforcement` supports offline checks |
 
-| Component | Role |
-|-----------|------|
-| [`RACPreCommitChecker`](src/rac_core/checker/precommit.py) | Main pre-call decision: lineage resolution, resource-origin checks, basis inheritance/tightening, consistency rules → `Decision` |
-| [`EventAdapter`](src/rac_core/adapter/event_adapter.py) | Builds [`TypedAuthorizationEvent`](src/rac_core/models/event.py) from pending tool call + trusted manifests |
-| Stores | [`InMemoryCausalLineageStore`](src/rac_core/store/lineage_store.py), [`InMemoryBasisStore`](src/rac_core/store/basis_store.py) |
+## Environment
 
-## Decision policy (prototype scope)
+- Python **3.11+** (see `pyproject.toml`; older versions may warn in `check_env.sh`).
+- `python3 -m pip install -r requirements.txt && python3 -m pip install -e .`
+- **matplotlib**: only for `scripts/paper_optional/` (`pip install -e ".[dev]"`).
 
-- **`RACPreCommitChecker`** returns **`ALLOW`** or **`BLOCK`** only.
-- [`DecisionType.ALLOW_WITH_ALERT`](src/rac_core/models/decision.py) exists as a **reserved** enum value for reporting compatibility; there is **no** alert policy engine in this prototype.
-
-## Lineage / predecessors
-
-- **Conservative single-predecessor model**: if input anchors resolve to **more than one distinct producer event**, the checker returns **`MULTI_PREDECESSOR_UNSUPPORTED`** (merge / join of multiple predecessors is **not** in scope).
-
-## Evaluation assets (paper-oriented)
-
-- Controlled traces and taxonomy scenarios (`src/rac_core/validation/`)
-- Component ablation (`src/rac_core/validation/ablation.py`, `component_ablation_cases.py`)
-- Latency / overhead microbenchmarks (`src/rac_core/evaluation/latency.py`, `validation/rac_tracebench_overhead.py`)
-- MCP official SDK guarded demo (`examples/mcp_official_sdk/`) and related case studies
-
-The older synthetic **external** trace benchmark path has been **retired**. This repository does **not** depend on the external trace repository previously referenced at `/root/projects/agent-auth-trace-bench`.
-
-## Supplementary design notes
-
-- [`docs/authorization_event_mapper.md`](docs/authorization_event_mapper.md) — Authorization Event Mapper (AEM) at the MCP client boundary
-- [`docs/mcp_case_study_plan.md`](docs/mcp_case_study_plan.md) — MCP live enforcement case study plan
-
-## Minimal reproduction
+## Minimal reviewer path
 
 ```bash
-# from repository root; Python >= 3.11
-python3 -m pip install -e ".[dev]"
-python3 -m pytest tests -q
+bash scripts/check_env.sh
+bash scripts/check_artifact.sh          # smoke + latency CLI tests
+export RAC_TRACEBENCH_ROOT=/path/to/rac_tracebench_v06   # if not under data/ or sibling mcp_data/
+bash scripts/run_all.sh                 # optional: --quick-latency, --with-mcp
 ```
 
-**Optional** RAC-TraceBench v0.6 JSON replay (skipped in CI if bundle absent): set `RAC_TRACEBENCH_ROOT` to the trace bundle root so `tests/test_rac_tracebench_v06_*.py` runs.
+Per-RQ commands are unchanged in spirit: `run_tracebench.sh`, `run_ablation.sh`, `run_latency.sh`, `run_tracebench_overhead.sh`, `run_mcp_case_study.sh` (see `docs/artifact_guide.md`).
 
-**Optional** real filesystem MCP integration tests: set `RAC_REAL_MCP_SERVER_CMD` (see `tests/test_mcp_real_filesystem_v06_guarded.py`).
+## Outputs
 
-Static TraceBench replay + CSV/JSON summaries:
+- Fresh runs write under **`artifacts/results/`** (and `artifacts/results/performance/` for synthetic latency).
+- **`artifacts/expected/summaries/`** holds reference JSON only; semantic metrics should match when the TraceBench bundle and code revision align. Latency ms values may float.
 
-```bash
-python3 scripts/run_rac_tracebench_v06.py --help
-```
+## Optional derived outputs
 
-Overhead microbenchmark:
+Not part of the minimal artifact path. See `scripts/paper_optional/README.md`. Inputs resolve from `artifacts/results/` first, then `artifacts/expected/`.
 
-```bash
-python3 scripts/run_rac_tracebench_overhead.py --help
-```
+## License
 
-Committed experiment inputs under `results/` can be turned into figures/tables per [`artifacts/README_experiment_artifacts.md`](artifacts/README_experiment_artifacts.md).
+See `LICENSE` (anonymous placeholder).

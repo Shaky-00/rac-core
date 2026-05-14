@@ -1,0 +1,1245 @@
+{
+  "samples": [
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L1",
+      "total_ms": 0.27126,
+      "workflow_length": 1
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L1",
+      "total_ms": 0.264264,
+      "workflow_length": 1
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L1",
+      "total_ms": 0.2965,
+      "workflow_length": 1
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L1",
+      "total_ms": 0.270176,
+      "workflow_length": 1
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L1",
+      "total_ms": 0.255707,
+      "workflow_length": 1
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.253415,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.168238,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.148777,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.137226,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.130226,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.311951,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.183906,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.143587,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.145621,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.127053,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.25841,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.172198,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.140753,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.127516,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.124469,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.344513,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.306259,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.194843,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.158281,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.142219,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.272025,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.172482,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.118843,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.110123,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L5",
+      "total_ms": 0.102561,
+      "workflow_length": 5
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.268257,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.178008,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.14218,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.14075,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.127511,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 5
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.119774,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 6
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.116636,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 7
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.114411,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 8
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.114328,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "step_index": 9
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.116147,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.247272,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.165457,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.138585,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.130488,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.149879,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 5
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.134658,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 6
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.147312,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 7
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.1262,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 8
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.12017,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "step_index": 9
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.118744,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.262198,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.167372,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.141565,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.141298,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.130978,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 5
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.173033,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 6
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.124956,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 7
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.119953,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 8
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.113766,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "step_index": 9
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.117483,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.323597,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.216122,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.176487,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.180865,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.194277,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 5
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.175439,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 6
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.18965,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 7
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.167443,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 8
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.17525,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "step_index": 9
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.204813,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 0
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.26488,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 1
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.191823,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 2
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.171124,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 3
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.142519,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 4
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.134719,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 5
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.150225,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 6
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.131305,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 7
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.125034,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 8
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.122457,
+      "workflow_length": 10
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "step_index": 9
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "benign_workflow_scaling_L10",
+      "total_ms": 0.134233,
+      "workflow_length": 10
+    }
+  ],
+  "summaries": [
+    {
+      "max_ms": 0.2965,
+      "mean_ms": 0.27158140000000003,
+      "median_ms": 0.270176,
+      "metadata": {
+        "workflow_length": 1
+      },
+      "min_ms": 0.255707,
+      "n": 5,
+      "p95_ms": 0.291452,
+      "p99_ms": 0.2954904,
+      "scenario": "benign_workflow_scaling_L1"
+    },
+    {
+      "max_ms": 0.344513,
+      "mean_ms": 0.1798198,
+      "median_ms": 0.148777,
+      "metadata": {
+        "workflow_length": 5
+      },
+      "min_ms": 0.102561,
+      "n": 25,
+      "p95_ms": 0.3108126,
+      "p99_ms": 0.33669811999999993,
+      "scenario": "benign_workflow_scaling_L5"
+    },
+    {
+      "max_ms": 0.323597,
+      "mean_ms": 0.15963262,
+      "median_ms": 0.1418725,
+      "metadata": {
+        "workflow_length": 10
+      },
+      "min_ms": 0.113766,
+      "n": 50,
+      "p95_ms": 0.2636731,
+      "p99_ms": 0.2964803999999999,
+      "scenario": "benign_workflow_scaling_L10"
+    }
+  ]
+}

@@ -21,6 +21,8 @@ try:
 except ImportError:
     pytest.skip("mcp package required (install with: pip install 'mcp>=1.0,<2.0')", allow_module_level=True)
 
+pytestmark = pytest.mark.optional
+
 from examples.mcp_official_sdk.guarded_mcp_client import GuardedMCPClient
 from examples.mcp_official_sdk.run_mcp_sdk_case_study import _make_grant, _make_session
 from mcp import ClientSession, StdioServerParameters

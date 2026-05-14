@@ -1,1 +1,0 @@
-Coordinate with teammate but keep all processing local on file_A.

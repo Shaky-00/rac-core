@@ -1,1 +1,0 @@
-Read file_A then access folder_X mentioned in report.

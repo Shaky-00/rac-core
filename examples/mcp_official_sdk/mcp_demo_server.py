@@ -68,7 +68,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="create_email_draft",
-            description="Create an email draft (simulated external release action).",
+            description="Simulated external release action (compose external message).",
             inputSchema={
                 "type": "object",
                 "properties": {

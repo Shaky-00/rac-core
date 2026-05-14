@@ -53,7 +53,7 @@ def _format_decision(d: DecisionType) -> str:
 
 DEFAULT_SCENARIO_LABELS: dict[str, tuple[str, str]] = {
     "benign_read_summarize": ("Benign", "read → summarize"),
-    "action_escalation_external_email": ("Action escalation", "read → email draft"),
+    "action_escalation_external_email": ("Action escalation", "read → external email step"),
     "resource_expansion_file_b": ("Resource expansion", "read → summarize(file_B)"),
     "forged_predecessor": ("Forged predecessor", "read → fake anchor"),
     "purpose_drift": ("Purpose drift", "read → external purpose"),

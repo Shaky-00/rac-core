@@ -1,4 +1,0 @@
-Available tools: read_file, summarize_file, create_email_draft.
-Return only valid JSON with {"steps":[{"tool_name":"...","arguments":{...}}]}.
-Task: read file_A and summarize it for internal use.
-

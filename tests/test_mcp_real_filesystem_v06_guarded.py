@@ -19,6 +19,8 @@ if str(REPO / "src") not in sys.path:
 
 pytest.importorskip("mcp")
 
+pytestmark = pytest.mark.optional
+
 from examples.mcp_real_filesystem_v06.guarded_real_filesystem_client import GuardedRealFilesystemClient
 from examples.mcp_real_filesystem_v06.real_filesystem_adapter import SandboxResourceMapper
 from examples.mcp_real_filesystem_v06.results_export import (

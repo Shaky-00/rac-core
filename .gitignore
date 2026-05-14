@@ -6,11 +6,22 @@ __pycache__/
 venv/
 dist/
 build/
+
+# Top-level artifact blobs (if any)
 artifacts/*.json
 artifacts/*.csv
 
-# Stage 6D generated tables (keep directory via .gitkeep)
-artifacts/tables/*
-!artifacts/tables/.gitkeep
-artifacts/performance/*
-!artifacts/performance/.gitkeep
+# Runtime outputs (never commit generated experiment outputs)
+artifacts/results/*
+!artifacts/results/.gitkeep
+
+# Optional paper script outputs
+artifacts/generated/*
+!artifacts/generated/.gitkeep
+
+# Optional small auxiliary inputs (large CSVs intentionally not tracked)
+artifacts/expected/data/*
+!artifacts/expected/data/.gitkeep
+!artifacts/expected/data/rac_tracebench_v06_benign_summary.csv
+!artifacts/expected/data/rac_tracebench_v06_benign_summary.json
+!artifacts/expected/data/mcp_real_filesystem_v06_results.csv

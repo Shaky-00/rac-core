@@ -97,7 +97,7 @@ def generate_llm_plan_report_results(
     output_dir: Path | str,
     *,
     fixture_dir: str | Path | None = None,
-    caption: str | None = "Replayed LLM tool plans with RAC (Stage 8A).",
+    caption: str | None = "Replayed planner-style tool plans with RAC (Stage 8A).",
     label: str | None = "tab:llm_plan_results",
 ) -> list[Path]:
     out_dir = Path(output_dir)

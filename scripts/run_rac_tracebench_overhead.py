@@ -2,12 +2,12 @@
 
 Run from repository root, for example:
 
-  RAC_TRACEBENCH_ROOT=/root/projects/mcp_data/rac_tracebench_v06 \\
-    python scripts/run_rac_tracebench_overhead.py --iterations 100
+  export RAC_TRACEBENCH_ROOT=/path/to/rac_tracebench_v06
+  python scripts/run_rac_tracebench_overhead.py --iterations 100
 
 Outputs:
-  results/rac_tracebench_v06_overhead.csv
-  results/rac_tracebench_v06_overhead_summary.json
+  artifacts/results/rac_tracebench_v06_overhead.csv
+  artifacts/results/rac_tracebench_v06_overhead_summary.json
 """
 
 from __future__ import annotations
@@ -38,8 +38,8 @@ def main() -> None:
     p.add_argument(
         "--output-dir",
         type=Path,
-        default=ROOT / "results",
-        help="Directory for CSV and JSON (default: <repo>/results)",
+        default=ROOT / "artifacts" / "results",
+        help="Directory for CSV and JSON (default: <repo>/artifacts/results)",
     )
     p.add_argument(
         "--root",
@@ -55,8 +55,9 @@ def main() -> None:
     root = resolve_tracebench_root(args.root)
     if root is None:
         print(
-            "ERROR: RAC-TraceBench root not found. Set RAC_TRACEBENCH_ROOT or place "
-            "mcp_data/rac_tracebench_v06 next to the repo. Use --root to pass a path.",
+            "ERROR: RAC-TraceBench root not found. Set RAC_TRACEBENCH_ROOT or place the bundle under\n"
+            "  data/tracebench/rac_tracebench_v06/\n"
+            "or mcp_data/rac_tracebench_v06/ next to the repository. Use --root to pass a path.",
             file=sys.stderr,
         )
         sys.exit(1)

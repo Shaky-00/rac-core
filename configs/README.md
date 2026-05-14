@@ -1,0 +1,1 @@
+Action semantics and grant-profile YAML used by the default checker live under `src/rac_core/action_semantics/` and related packages. There is no separate `configs/` tree in this artifact; paths are resolved via `default_semantics_yaml_path()` and TraceBench bundle manifests.

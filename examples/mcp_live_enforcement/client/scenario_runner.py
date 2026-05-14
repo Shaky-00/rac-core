@@ -51,7 +51,7 @@ async def _open_server(stack: AsyncExitStack, script_name: str, log_path: Path) 
 
 async def run_all() -> dict[str, Any]:
     traces_path = BASE / "traces" / "mcp_guarded_trace.jsonl"
-    results_path = BASE / "results" / "mcp_case_study_results.json"
+    results_path = BASE / "case_outputs" / "mcp_case_study_results.json"
     if traces_path.exists():
         traces_path.unlink()
 

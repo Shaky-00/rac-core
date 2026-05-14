@@ -58,7 +58,9 @@ def rac_tracebench_root_candidates() -> list[Path]:
     out: list[Path] = []
     if env:
         out.append(Path(env).expanduser().resolve())
-    out.append(Path(__file__).resolve().parents[3] / "mcp_data" / "rac_tracebench_v06")
+    repo = Path(__file__).resolve().parents[3]
+    out.append(repo / "data" / "tracebench" / "rac_tracebench_v06")
+    out.append(repo / "mcp_data" / "rac_tracebench_v06")
     out.append(Path(__file__).resolve().parents[4] / "mcp_data" / "rac_tracebench_v06")
     return out
 
@@ -506,8 +508,9 @@ def convert_trace_case_to_controlled_trace(
     if tpl_list:
         if tb_root is None:
             raise FileNotFoundError(
-                "Cannot build TraceBench initial_basis: set RAC_TRACEBENCH_ROOT or place "
-                "mcp_data/rac_tracebench_v06 next to the repository so grant templates can be loaded."
+                "Cannot build TraceBench initial_basis: set RAC_TRACEBENCH_ROOT or place the bundle under "
+                "data/tracebench/rac_tracebench_v06/ or mcp_data/rac_tracebench_v06/ next to the repository "
+                "so grant templates can be loaded."
             )
         gpath = tb_root / "grants" / "sample_grant_templates_v06.yaml"
         grant_templates_path = str(gpath.resolve())

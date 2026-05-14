@@ -1,0 +1,363 @@
+#!/usr/bin/env python3
+"""Optional helper for overhead tables and figures from TraceBench overhead CSV only.
+
+Reads ``rac_tracebench_v06_overhead.csv`` from ``artifacts/results/`` or
+``artifacts/expected/data/`` (same aggregation semantics as
+``scripts/paper_optional/build_rac_paper_overhead_v3.py``). Does not rerun benchmarks or modify RAC.
+"""
+
+from __future__ import annotations
+
+import csv
+import math
+import sys
+from pathlib import Path
+from typing import Any
+
+from io_paths import repo_root, try_pick_input
+
+ROOT = repo_root()
+OUT_TBL = ROOT / "artifacts" / "generated" / "tables_rq4"
+OUT_FIG = ROOT / "artifacts" / "generated" / "figures_rq4"
+
+
+def _parse_ms(raw: str | None) -> float | None:
+    if raw is None or str(raw).strip() == "":
+        return None
+    try:
+        return float(raw)
+    except ValueError:
+        return None
+
+
+def _parse_ms_zero(raw: str | None) -> float:
+    v = _parse_ms(raw)
+    return 0.0 if v is None else v
+
+
+def _pctile(sorted_vals: list[float], q: float) -> float:
+    if not sorted_vals:
+        return float("nan")
+    xs = sorted_vals
+    n = len(xs)
+    if n == 1:
+        return xs[0]
+    idx = (n - 1) * (q / 100.0)
+    lo = int(math.floor(idx))
+    hi = int(math.ceil(idx))
+    if lo == hi:
+        return xs[lo]
+    return xs[lo] + (xs[hi] - xs[lo]) * (idx - lo)
+
+
+def _stats(vals: list[float]) -> dict[str, float]:
+    if not vals:
+        return {
+            "p50_ms": float("nan"),
+            "p95_ms": float("nan"),
+            "p99_ms": float("nan"),
+            "mean_ms": float("nan"),
+        }
+    s = sorted(vals)
+    return {
+        "p50_ms": _pctile(s, 50),
+        "p95_ms": _pctile(s, 95),
+        "p99_ms": _pctile(s, 99),
+        "mean_ms": sum(s) / len(s),
+    }
+
+
+def load_rows(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def component_rows(rows: list[dict[str, str]]) -> list[tuple[str, str, bool]]:
+    """(display name, column or __trace__, is_per_step)."""
+    return [
+        ("Output-anchor precheck", "output_anchor_precheck_ms", True),
+        ("Lineage resolution", "lineage_resolution_ms", True),
+        ("PreCommit check", "precommit_check_ms", True),
+        ("Total step", "total_step_ms", True),
+        ("Total trace", "__trace__", False),
+    ]
+
+
+def trace_ms_deduped(rows: list[dict[str, str]]) -> list[float]:
+    seen: set[tuple[str, str]] = set()
+    out: list[float] = []
+    for row in rows:
+        key = (row.get("iteration", ""), row.get("trace_id", ""))
+        if key in seen or key == ("", ""):
+            continue
+        v = _parse_ms(row.get("total_trace_ms") or row.get("replay_total_ms"))
+        if v is None:
+            continue
+        seen.add(key)
+        out.append(v)
+    return out
+
+
+def build_stats(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
+    trace_vals = trace_ms_deduped(rows)
+    stats_rows: list[dict[str, Any]] = []
+    for name, col, is_step in component_rows(rows):
+        if is_step:
+            vals = [_parse_ms_zero(row.get(col)) for row in rows]
+        else:
+            vals = trace_vals
+        st = _stats(sorted(vals))
+        stats_rows.append({"component": name, **st, "n": len(vals)})
+    return stats_rows
+
+
+def build_stats_step_components_only(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
+    """Four step-level components only (excludes Total trace). Same CSV semantics as v3 table."""
+    specs = [
+        ("Output-anchor precheck", "output_anchor_precheck_ms"),
+        ("Lineage resolution", "lineage_resolution_ms"),
+        ("PreCommit check", "precommit_check_ms"),
+        ("Total step", "total_step_ms"),
+    ]
+    out: list[dict[str, Any]] = []
+    for name, col in specs:
+        vals = [_parse_ms_zero(row.get(col)) for row in rows]
+        st = _stats(sorted(vals))
+        out.append({"component": name, **st, "n": len(vals)})
+    return out
+
+
+def write_markdown(stats_rows: list[dict[str, Any]], path: Path) -> None:
+    lines = [
+        "| Component | p50_ms | p95_ms | p99_ms | mean_ms |",
+        "| --- | ---: | ---: | ---: | ---: |",
+    ]
+    for r in stats_rows:
+        lines.append(
+            f"| {r['component']} | {r['p50_ms']:.6g} | {r['p95_ms']:.6g} | {r['p99_ms']:.6g} | {r['mean_ms']:.6g} |"
+        )
+    lines.append("")
+    lines.append(
+        "*Source: `artifacts/results/rac_tracebench_v06_overhead.csv` or `artifacts/expected/data/rac_tracebench_v06_overhead.csv`. "
+        "Step-level components treat empty cells as 0 ms (same as the v3 overhead table). "
+        "Total trace: one sample per (iteration, trace_id).*"
+    )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _tex_num(x: float) -> str:
+    if x != x:  # NaN
+        return "---"
+    return f"{x:.4f}"
+
+
+def write_latex_interval_table(stats_rows: list[dict[str, Any]], path: Path) -> None:
+    """LaTeX table: four step components (no Total trace)."""
+    lines = [
+        r"% Generated by scripts/build_rq4_paper_artifacts.py",
+        r"% Step-level components from rac_tracebench_v06_overhead.csv under artifacts/results or artifacts/expected/data",
+        r"% Requires: \usepackage{booktabs}",
+        r"\begin{tabular}{@{}lrrrr@{}}",
+        r"\toprule",
+        r"Component & p50 (ms) & p95 (ms) & p99 (ms) & mean (ms) \\",
+        r"\midrule",
+    ]
+    for r in stats_rows:
+        comp = r["component"].replace("&", r"\&")
+        lines.append(
+            f"{comp} & {_tex_num(r['p50_ms'])} & {_tex_num(r['p95_ms'])} & {_tex_num(r['p99_ms'])} & {_tex_num(r['mean_ms'])} \\\\"
+        )
+    lines.extend([r"\bottomrule", r"\end{tabular}", ""])
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def write_latex(stats_rows: list[dict[str, Any]], path: Path) -> None:
+    """Minimal LaTeX tabular; use with \\usepackage{booktabs} in preamble."""
+    lines = [
+        r"% Generated by scripts/build_rq4_paper_artifacts.py",
+        r"% Requires: \usepackage{booktabs}",
+        r"\begin{tabular}{@{}lrrrr@{}}",
+        r"\toprule",
+        r"Component & p50 (ms) & p95 (ms) & p99 (ms) & mean (ms) \\",
+        r"\midrule",
+    ]
+    for r in stats_rows:
+        comp = r["component"].replace("&", r"\&")
+        lines.append(
+            f"{comp} & {_tex_num(r['p50_ms'])} & {_tex_num(r['p95_ms'])} & {_tex_num(r['p99_ms'])} & {_tex_num(r['mean_ms'])} \\\\"
+        )
+    lines.extend([r"\bottomrule", r"\end{tabular}", ""])
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def figure_component_clean(stats_rows: list[dict[str, Any]], stem: Path) -> None:
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+
+    mpl.rcParams.update(
+        {
+            "font.family": "serif",
+            "font.size": 8,
+            "axes.labelsize": 9,
+            "xtick.labelsize": 7.5,
+            "ytick.labelsize": 8,
+            "legend.fontsize": 7.5,
+            "axes.linewidth": 0.8,
+            "axes.edgecolor": "#222222",
+            "figure.facecolor": "white",
+            "axes.facecolor": "white",
+        }
+    )
+
+    labels = [r["component"] for r in stats_rows]
+    p50 = [r["p50_ms"] for r in stats_rows]
+    p95 = [r["p95_ms"] for r in stats_rows]
+    p99 = [r["p99_ms"] for r in stats_rows]
+
+    x = range(len(labels))
+    w = 0.24
+    colors = ("#2e5f8e", "#6b8eb7", "#b85450")
+
+    fig, ax = plt.subplots(figsize=(5.2, 2.6))
+    ax.bar([i - w for i in x], p50, width=w, label="p50", color=colors[0], edgecolor="#1a1a1a", linewidth=0.35)
+    ax.bar(x, p95, width=w, label="p95", color=colors[1], edgecolor="#1a1a1a", linewidth=0.35)
+    ax.bar([i + w for i in x], p99, width=w, label="p99", color=colors[2], edgecolor="#1a1a1a", linewidth=0.35)
+
+    ax.set_xticks(list(x))
+    ax.set_xticklabels(
+        [
+            "Output-anchor\nprecheck",
+            "Lineage\nresolution",
+            "PreCommit\ncheck",
+            "Total\nstep",
+            "Total\ntrace",
+        ],
+    )
+    ax.set_ylabel("Latency (ms)")
+    ax.set_ylim(0, max(p99) * 1.12)
+    ax.legend(frameon=False, ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.18))
+    ax.yaxis.grid(True, linestyle=":", linewidth=0.5, color="#999999", alpha=0.7)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    fig.tight_layout(rect=(0, 0, 1, 0.88))
+    stem.parent.mkdir(parents=True, exist_ok=True)
+    kw = dict(bbox_inches="tight", pad_inches=0.03)
+    fig.savefig(stem.with_suffix(".pdf"), **kw)
+    fig.savefig(stem.with_suffix(".png"), dpi=220, **kw)
+    plt.close(fig)
+
+
+def figure_overhead_interval(step_rows: list[dict[str, Any]], stem: Path) -> None:
+    """Horizontal interval plot: p50 (dot), p50–p95 (dark line), p95–p99 (light segment + end tick)."""
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+
+    mpl.rcParams.update(
+        {
+            "font.family": "serif",
+            "font.size": 7.5,
+            "axes.labelsize": 8.5,
+            "xtick.labelsize": 7.5,
+            "ytick.labelsize": 7.5,
+            "axes.linewidth": 0.75,
+            "axes.edgecolor": "#2a2a2a",
+            "figure.facecolor": "white",
+            "axes.facecolor": "white",
+        }
+    )
+
+    # Subtle blue-gray for primary segment; lighter gray for tail (academic, not bright)
+    c_primary = "#3d4f5f"
+    c_tail = "#9aa8b2"
+    c_dot = "#1a1a1a"
+    c_tick = "#6d7a82"
+
+    y_labels = [
+        "Output-anchor precheck",
+        "Lineage resolution",
+        "PreCommit check",
+        "Total step",
+    ]
+    n = len(step_rows)
+    assert n == len(y_labels)
+
+    fig, ax = plt.subplots(figsize=(3.45, 2.35))
+
+    ymax = 0.0
+    for i, row in enumerate(step_rows):
+        p50 = row["p50_ms"]
+        p95 = row["p95_ms"]
+        p99 = row["p99_ms"]
+        ymax = max(ymax, p99)
+        yi = float(i)
+        ax.plot([p50, p95], [yi, yi], color=c_primary, solid_capstyle="round", linewidth=1.15, zorder=2)
+        ax.plot([p95, p99], [yi, yi], color=c_tail, linewidth=1.0, linestyle=(0, (3, 2.5)), zorder=1)
+        ax.plot(p50, yi, "o", color=c_dot, markersize=3.8, zorder=4, clip_on=False)
+        ax.plot([p99, p99], [yi - 0.16, yi + 0.16], color=c_tick, linewidth=0.85, solid_capstyle="projecting", zorder=3)
+
+    ax.set_yticks(range(n))
+    ax.set_yticklabels(y_labels)
+    ax.invert_yaxis()
+    ax.set_xlabel("Latency (ms)")
+    ax.set_xlim(0, ymax * 1.06)
+    ax.set_ylim(n - 0.5, -0.5)
+    ax.set_title(
+        "Component-level latency summary for RAC pre-commit checking.",
+        fontsize=8,
+        color="#222222",
+        pad=6,
+    )
+    ax.xaxis.grid(True, linestyle=":", linewidth=0.45, color="#c8c8c8", alpha=0.9)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    fig.tight_layout(pad=0.6)
+    stem.parent.mkdir(parents=True, exist_ok=True)
+    kw = dict(bbox_inches="tight", pad_inches=0.04)
+    fig.savefig(stem.with_suffix(".pdf"), **kw)
+    fig.savefig(stem.with_suffix(".png"), dpi=220, **kw)
+    plt.close(fig)
+
+
+def main() -> int:
+    csv_path = try_pick_input("rac_tracebench_v06_overhead.csv")
+    if csv_path is None or not csv_path.is_file():
+        print(
+            "ERROR: rac_tracebench_v06_overhead.csv not found under artifacts/results/ or "
+            "artifacts/expected/data/. Run: bash scripts/run_tracebench_overhead.sh",
+            file=sys.stderr,
+        )
+        return 2
+    rows = load_rows(csv_path)
+    stats_rows = build_stats(rows)
+    step_only = build_stats_step_components_only(rows)
+
+    OUT_TBL.mkdir(parents=True, exist_ok=True)
+    OUT_FIG.mkdir(parents=True, exist_ok=True)
+    write_markdown(stats_rows, OUT_TBL / "table_overhead_component_summary.md")
+    write_latex(stats_rows, OUT_TBL / "table_overhead_component_summary.tex")
+    figure_component_clean(stats_rows, OUT_FIG / "fig_overhead_component_clean")
+
+    write_latex_interval_table(step_only, OUT_TBL / "table_overhead_interval.tex")
+    figure_overhead_interval(step_only, OUT_FIG / "fig_overhead_interval")
+
+    print("Wrote:")
+    print(f"  {OUT_TBL / 'table_overhead_component_summary.md'}")
+    print(f"  {OUT_TBL / 'table_overhead_component_summary.tex'}")
+    print(f"  {OUT_FIG / 'fig_overhead_component_clean.pdf'}")
+    print(f"  {OUT_FIG / 'fig_overhead_component_clean.png'}")
+    print(f"  {OUT_TBL / 'table_overhead_interval.tex'}")
+    print(f"  {OUT_FIG / 'fig_overhead_interval.pdf'}")
+    print(f"  {OUT_FIG / 'fig_overhead_interval.png'}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

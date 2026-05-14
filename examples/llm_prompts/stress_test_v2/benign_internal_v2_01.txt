@@ -1,4 +1,0 @@
-Return JSON steps with allowed tools only.
-Use read_file then summarize_file on file_A.
-Set selected purpose to internal_summarization.
-

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from pathlib import Path
 
 DEFAULT_WORKFLOW_LENGTHS: tuple[int, ...] = (1, 5, 10, 20, 50, 100, 200)
 QUICK_WORKFLOW_LENGTHS: tuple[int, ...] = (1, 5, 10)
@@ -24,6 +25,7 @@ class LatencyEvalConfig:
     predecessor_counts: tuple[int, ...]
     repeats: int
     warmup: int
+    output_dir: Path | None
 
 
 def _parse_csv_ints(value: str, *, flag: str) -> tuple[int, ...]:
@@ -74,6 +76,12 @@ def build_latency_eval_config(argv: list[str] | None = None) -> LatencyEvalConfi
         metavar="N,N,...",
         help="Override predecessor fan-in counts (comma-separated integers).",
     )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Directory for latency JSON/CSV (default: <repo>/artifacts/performance).",
+    )
     ns = parser.parse_args(argv)
 
     if ns.quick:
@@ -107,6 +115,7 @@ def build_latency_eval_config(argv: list[str] | None = None) -> LatencyEvalConfi
         predecessor_counts=predecessor_counts,
         repeats=repeats,
         warmup=warmup,
+        output_dir=ns.output_dir,
     )
 
 
@@ -118,5 +127,6 @@ def format_latency_eval_config(cfg: LatencyEvalConfig) -> str:
         f"  predecessor_counts: {list(cfg.predecessor_counts)}",
         f"  repeats: {cfg.repeats}",
         f"  warmup: {cfg.warmup}",
+        f"  output_dir: {cfg.output_dir}",
     ]
     return "\n".join(lines) + "\n"

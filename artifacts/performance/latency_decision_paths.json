@@ -1,0 +1,350 @@
+{
+  "samples": [
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "scenario_name": "benign_read_summarize"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_benign_read_summarize",
+      "total_ms": 0.476866,
+      "workflow_length": null
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "scenario_name": "benign_read_summarize"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_benign_read_summarize",
+      "total_ms": 0.455896,
+      "workflow_length": null
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "scenario_name": "benign_read_summarize"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_benign_read_summarize",
+      "total_ms": 0.470679,
+      "workflow_length": null
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "scenario_name": "benign_read_summarize"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_benign_read_summarize",
+      "total_ms": 0.454781,
+      "workflow_length": null
+    },
+    {
+      "decision": "ALLOW",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "scenario_name": "benign_read_summarize"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_benign_read_summarize",
+      "total_ms": 0.674872,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "scenario_name": "action_escalation_external_email"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_action_escalation_external_email",
+      "total_ms": 0.43305,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "scenario_name": "action_escalation_external_email"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_action_escalation_external_email",
+      "total_ms": 0.548652,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "scenario_name": "action_escalation_external_email"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_action_escalation_external_email",
+      "total_ms": 0.449254,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "scenario_name": "action_escalation_external_email"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_action_escalation_external_email",
+      "total_ms": 0.39721,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "scenario_name": "action_escalation_external_email"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_action_escalation_external_email",
+      "total_ms": 0.41947,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "scenario_name": "resource_expansion_file_b"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_resource_expansion_file_b",
+      "total_ms": 0.53441,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "scenario_name": "resource_expansion_file_b"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_resource_expansion_file_b",
+      "total_ms": 0.400159,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "scenario_name": "resource_expansion_file_b"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_resource_expansion_file_b",
+      "total_ms": 0.489508,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "scenario_name": "resource_expansion_file_b"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_resource_expansion_file_b",
+      "total_ms": 0.486885,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "scenario_name": "resource_expansion_file_b"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_resource_expansion_file_b",
+      "total_ms": 0.49146,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 0,
+        "scenario_name": "forged_predecessor"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_forged_predecessor",
+      "total_ms": 0.36904,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 1,
+        "scenario_name": "forged_predecessor"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_forged_predecessor",
+      "total_ms": 0.306718,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 2,
+        "scenario_name": "forged_predecessor"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_forged_predecessor",
+      "total_ms": 0.316899,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 3,
+        "scenario_name": "forged_predecessor"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_forged_predecessor",
+      "total_ms": 0.340351,
+      "workflow_length": null
+    },
+    {
+      "decision": "BLOCK",
+      "event_construction_ms": null,
+      "metadata": {
+        "repeat": 4,
+        "scenario_name": "forged_predecessor"
+      },
+      "output_anchor_verification_ms": null,
+      "persistence_ms": null,
+      "precommit_check_ms": null,
+      "predecessor_count": null,
+      "scenario": "decision_path_forged_predecessor",
+      "total_ms": 0.309461,
+      "workflow_length": null
+    }
+  ],
+  "summaries": [
+    {
+      "max_ms": 0.674872,
+      "mean_ms": 0.5066188,
+      "median_ms": 0.470679,
+      "metadata": {},
+      "min_ms": 0.454781,
+      "n": 5,
+      "p95_ms": 0.6352708,
+      "p99_ms": 0.66695176,
+      "scenario": "decision_path_benign_read_summarize"
+    },
+    {
+      "max_ms": 0.548652,
+      "mean_ms": 0.4495272,
+      "median_ms": 0.43305,
+      "metadata": {},
+      "min_ms": 0.39721,
+      "n": 5,
+      "p95_ms": 0.5287724,
+      "p99_ms": 0.54467608,
+      "scenario": "decision_path_action_escalation_external_email"
+    },
+    {
+      "max_ms": 0.53441,
+      "mean_ms": 0.48048440000000003,
+      "median_ms": 0.489508,
+      "metadata": {},
+      "min_ms": 0.400159,
+      "n": 5,
+      "p95_ms": 0.5258200000000001,
+      "p99_ms": 0.532692,
+      "scenario": "decision_path_resource_expansion_file_b"
+    },
+    {
+      "max_ms": 0.36904,
+      "mean_ms": 0.3284938,
+      "median_ms": 0.316899,
+      "metadata": {},
+      "min_ms": 0.306718,
+      "n": 5,
+      "p95_ms": 0.36330219999999996,
+      "p99_ms": 0.36789244,
+      "scenario": "decision_path_forged_predecessor"
+    }
+  ]
+}

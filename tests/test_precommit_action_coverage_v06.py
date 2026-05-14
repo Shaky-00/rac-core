@@ -50,7 +50,7 @@ def _basis_from_templates(template_ids: list[str]) -> AuthorizationBasis:
         resource_scope=BasisResourceScope(type="file", ids={"file_A"}),
         legacy_actions={"read", "summarize"},
     )
-    # Align with default build_grant() purpose_scope so legacy purpose checks pass.
+    # Match default build_grant() purpose_scope for purpose checks.
     return b.model_copy(
         update={"purpose_scope": b.purpose_scope | {"internal_summarization"}}
     )

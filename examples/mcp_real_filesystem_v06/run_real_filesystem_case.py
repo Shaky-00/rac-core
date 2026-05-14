@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run RAC-guarded workflows against a real filesystem MCP server (stdio).
 
-The script creates a **temporary** sandbox (file_A.txt, file_B.txt, out/) and appends that
+The script creates an **ephemeral** sandbox directory (file_A.txt, file_B.txt, out/) and appends that
 directory as the **last** argv token to the MCP server process (typical for
 ``@modelcontextprotocol/server-filesystem``).
 
@@ -15,7 +15,7 @@ Example:
   export RAC_REAL_MCP_SERVER_ARGS='-y @modelcontextprotocol/server-filesystem'
   python3 examples/mcp_real_filesystem_v06/run_real_filesystem_case.py
 
-Artifacts (default ``--output-dir`` = repository ``results/``):
+Artifacts (default ``--output-dir`` = ``artifacts/results/``):
   mcp_real_filesystem_v06_results.csv
   mcp_real_filesystem_v06_summary.json
 """
@@ -57,7 +57,7 @@ from examples.mcp_real_filesystem_v06.results_export import (
     write_summary_json,
 )
 
-DEFAULT_RESULTS_DIR = ROOT / "results"
+DEFAULT_RESULTS_DIR = ROOT / "artifacts" / "results"
 
 TRACE_JSONL = Path(__file__).resolve().parent / "traces" / "mcp_real_filesystem_v06_trace.jsonl"
 

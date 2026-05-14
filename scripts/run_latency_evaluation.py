@@ -134,7 +134,11 @@ def run_latency_evaluation(
 def main(argv: list[str] | None = None) -> None:
     """Entry point. ``argv`` defaults to ``sys.argv[1:]`` via :func:`build_latency_eval_config`."""
     cfg = build_latency_eval_config(argv)
-    out_dir = REPO_ROOT / "artifacts" / "performance"
+    out_dir = cfg.output_dir
+    if out_dir is None:
+        out_dir = REPO_ROOT / "artifacts" / "performance"
+    else:
+        out_dir = out_dir.expanduser().resolve()
     run_latency_evaluation(cfg, out_dir=out_dir, log=sys.stdout)
 
 

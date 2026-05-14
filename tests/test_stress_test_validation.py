@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.optional
+
 from rac_core.demo.llm_planner import ReplayLLMPlanner
 from rac_core.demo.reporting import make_demo_controller_for_scenario
 from rac_core.models import DecisionType

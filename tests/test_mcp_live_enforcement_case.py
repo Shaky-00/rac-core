@@ -10,7 +10,7 @@ mcp = pytest.importorskip("mcp")
 
 from examples.mcp_live_enforcement.client.scenario_runner import run_all
 
-BASE = Path("/root/projects/rac-core/examples/mcp_live_enforcement")
+BASE = Path(__file__).resolve().parents[1] / "examples" / "mcp_live_enforcement"
 
 
 def _read_jsonl(path: Path) -> list[dict[str, object]]:

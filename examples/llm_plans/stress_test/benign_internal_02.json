@@ -2,10 +2,6 @@
   "scenario_name": "benign_internal_02",
   "task": "Summarize file_A for internal note #2",
   "planner": "replay",
-  "recorded_from": "stress_fixture",
-  "model": "fixture",
-  "provider": "offline",
-  "notes": "Stress-test fixture plan.",
   "expected_decision": "ALLOW",
   "expected_rule": null,
   "steps": [
@@ -21,7 +17,5 @@
         "input_anchor": "previous"
       }
     }
-  ],
-  "raw_output_file": "examples/llm_raw_outputs/stress_test/benign_internal_02.json",
-  "prompt_file": "examples/llm_prompts/stress_test/benign_internal_02.txt"
+  ]
 }

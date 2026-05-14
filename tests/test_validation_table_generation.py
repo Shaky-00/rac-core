@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.optional
+
 REPO = Path(__file__).resolve().parents[1]
 
 
@@ -10,7 +12,7 @@ REPO = Path(__file__).resolve().parents[1]
 def gen_mod():
     spec = importlib.util.spec_from_file_location(
         "rac_generate_validation_tables",
-        REPO / "scripts" / "generate_validation_tables.py",
+        REPO / "scripts" / "paper_optional" / "generate_validation_tables.py",
     )
     assert spec and spec.loader
     mod = importlib.util.module_from_spec(spec)

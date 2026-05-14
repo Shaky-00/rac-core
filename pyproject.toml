@@ -22,3 +22,6 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]
 testpaths = ["tests"]
+markers = [
+    "optional: not required for minimal artifact smoke (MCP demos, stress corpora, etc.)",
+]

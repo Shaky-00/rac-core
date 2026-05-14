@@ -1,7 +1,7 @@
-{"timestamp": "2026-05-09T07:33:38.514561+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A"}}
-{"timestamp": "2026-05-09T07:33:38.570085+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A"}}
-{"timestamp": "2026-05-09T07:33:38.606931+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A_injected"}}
-{"timestamp": "2026-05-09T07:33:38.637341+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A_injected"}}
-{"timestamp": "2026-05-09T07:33:38.667765+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A"}}
-{"timestamp": "2026-05-09T07:33:38.696648+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A"}}
-{"timestamp": "2026-05-09T07:33:38.705052+00:00", "server": "document_server", "tool_name": "search_reports", "arguments": {"query": "related", "search_space_resource": "res:index:reports"}}
+{"timestamp": "2026-05-14T07:08:00.725002+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A"}}
+{"timestamp": "2026-05-14T07:08:00.774006+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A"}}
+{"timestamp": "2026-05-14T07:08:00.808511+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A_injected"}}
+{"timestamp": "2026-05-14T07:08:00.840538+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A_injected"}}
+{"timestamp": "2026-05-14T07:08:00.874083+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A"}}
+{"timestamp": "2026-05-14T07:08:00.954224+00:00", "server": "document_server", "tool_name": "read_report", "arguments": {"report_id": "res:report:A"}}
+{"timestamp": "2026-05-14T07:08:00.964038+00:00", "server": "document_server", "tool_name": "search_reports", "arguments": {"query": "related", "search_space_resource": "res:index:reports"}}
