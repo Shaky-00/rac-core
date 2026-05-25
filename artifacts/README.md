@@ -1,13 +1,15 @@
-# Artifacts layout (anonymous minimal artifact)
+# Artifacts layout
+
+Runtime experiment outputs are **gitignored**. Only small **expected** reference summaries are committed.
 
 | Path | Role |
 |------|------|
-| `expected/summaries/` | Small reference **JSON** summaries for optional comparison |
-| `expected/data/` | Optional small auxiliary files (e.g. benign suite CSV); large CSVs are not shipped—run core scripts first |
-| `artifacts/results/` | **Runtime outputs** (gitignored except `.gitkeep`; no root `results/` directory) |
-| `artifacts/results/performance/` | **Latency microbenchmark outputs** from `bash scripts/run_latency.sh` (not vendored; regenerate locally) |
-| `artifacts/performance/` | Placeholder only (`.gitkeep`); raw latency CSV/JSON are no longer checked in |
-| `figures_paper_rq4/` | Placeholder only (`.gitkeep`); pre-generated RQ4 PDF/PNG removed—use `scripts/paper_optional/build_rq4_paper_artifacts.py` → `artifacts/generated/figures_rq4/` |
-| `generated/` | Optional outputs from helper scripts under `scripts/paper_optional/` (tracked as empty + `.gitkeep`) |
+| `rq1_tracebench/` | RQ1 paired/core TraceBench conformance |
+| `rq2_baselines/` | RQ2 expanded baseline comparison (paper-scale) |
+| `rq3_mcp_filesystem/` | RQ3 real MCP filesystem enforcement (Table IV) |
+| `rq4_latency/` | RQ4 checking-path latency (quick + full replay scripts) |
+| `expected/summaries/` | Compatibility aliases → same JSON as per-RQ `expected/` |
+| `results/` | Default output root for `scripts/run_*.sh` (empty except `.gitkeep`) |
+| `generated/` | Reserved; not used in the minimal public artifact |
 
-Core reproduction writes to `artifacts/results/` via `scripts/run_*.sh`. Optional table or figure regeneration lives in `scripts/paper_optional/` and writes to `artifacts/generated/`.
+Each `rq*/results/` directory is for fresh runs from the matching scripts. Do not commit large CSV/JSON outputs.

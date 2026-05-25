@@ -1,3 +1,0 @@
-# Latency CSV/JSON is not vendored. Regenerate with:
-#   bash scripts/run_latency.sh
-# Outputs default to artifacts/results/performance/ (see scripts/run_latency.sh).

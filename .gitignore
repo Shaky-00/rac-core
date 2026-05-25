@@ -12,25 +12,30 @@ artifacts/*.json
 artifacts/*.csv
 
 # Runtime outputs (never commit generated experiment outputs)
-artifacts/results/*
+artifacts/results/**
 !artifacts/results/.gitkeep
-artifacts/figures_paper_rq2/*_meta.json
-
-# Optional paper script outputs
+artifacts/*/results/**
+!artifacts/*/results/.gitkeep
+artifacts/figures_paper_rq2/
+artifacts/figures_paper_rq4/
+artifacts/figures_paper_rq4_baseline_latency/
+artifacts/performance/
 artifacts/generated/*
 !artifacts/generated/.gitkeep
 
-# Optional small auxiliary inputs (large CSVs intentionally not tracked)
-artifacts/expected/data/*
-!artifacts/expected/data/.gitkeep
-!artifacts/expected/data/rac_tracebench_v06_benign_summary.csv
-!artifacts/expected/data/rac_tracebench_v06_benign_summary.json
-!artifacts/expected/data/mcp_real_filesystem_v06_results.csv
+# Removed / non-public experiment trees
+data/llm_drift_eval/
+data/tracebench_rq2_composite_overlay/
+scripts/paper_optional/
+docs/llm_drift_eval.md
+src/rac_core/validation/llm_drift_*.py
+scripts/*llm_drift*
+scripts/run_llm_drift_eval.sh
+tests/test_llm_drift_*.py
 
-# LLM generation artifacts (replay uses normalized inputs only)
-data/llm_drift_eval/scenarios/generated/
 **/raw_response.json
 **/prompts.json
+**/*_meta.json
 **/*api_key*
 **/*secret*
 *.log

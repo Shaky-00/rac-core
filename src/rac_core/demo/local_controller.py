@@ -56,7 +56,7 @@ def demo_initial_basis_from_grant(
     )
 
 
-# Backward-compatible name used by ``examples/mcp_live_enforcement`` and latency harness.
+# Backward-compatible name used by MCP filesystem demos and the latency harness.
 _demo_initial_basis_from_grant = demo_initial_basis_from_grant
 
 

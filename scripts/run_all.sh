@@ -46,12 +46,11 @@ else
   bash "$ROOT/scripts/run_latency.sh" "${LATENCY_ARGS[@]}"
 fi
 
+bash "$ROOT/scripts/run_mcp_case_study.sh"
 if [[ "$WITH_MCP" -eq 1 ]]; then
   if ! bash "$ROOT/scripts/run_mcp_case_study.sh" --live; then
-    echo "WARN: optional MCP live pytest failed (see messages above); core TraceBench outputs are unaffected." >&2
+    echo "WARN: optional live MCP filesystem pytest failed; RQ3 expected-summary check above is unaffected." >&2
   fi
-else
-  bash "$ROOT/scripts/run_mcp_case_study.sh"
 fi
 
 echo "run_all: done"

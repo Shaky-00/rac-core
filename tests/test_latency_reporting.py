@@ -172,19 +172,3 @@ def test_aggregate_decision_paths_maps_labels() -> None:
     assert out[0]["decision"] == "BLOCK"
 
 
-@pytest.mark.optional
-@pytest.mark.skipif(
-    not (REPO_ROOT / "artifacts" / "generated" / "performance" / "latency_workflow_scaling.csv").is_file(),
-    reason="latency CSV not present (run run_latency.sh first)",
-)
-def test_generate_script_runs_on_repo_artifacts() -> None:
-    script = REPO_ROOT / "scripts" / "paper_optional" / "generate_latency_report.py"
-    r = subprocess.run(
-        [sys.executable, str(script)],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
-    assert r.returncode == 0, r.stderr
-    assert "latency_workflow_scaling_summary" in r.stdout or "Generated:" in r.stdout

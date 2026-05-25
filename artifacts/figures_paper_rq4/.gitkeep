@@ -1,4 +1,0 @@
-# Pre-generated RQ4 PDF/PNG files were removed from version control.
-# Regenerate optional overhead figures with:
-#   python3 scripts/paper_optional/build_rq4_paper_artifacts.py
-# (writes under artifacts/generated/figures_rq4/).

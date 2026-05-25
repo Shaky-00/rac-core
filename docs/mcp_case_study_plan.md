@@ -1,6 +1,8 @@
 # MCP live enforcement case study (outline)
 
-This document sketches the **MCP-native live enforcement** path: RAC at the client/gateway boundary, operating on pending `tools/call` before server side effects. It aligns with the demo layout under `examples/` and the mapper notes in [`authorization_event_mapper.md`](authorization_event_mapper.md). Normative detail remains in the external RAC specification; code locations are indexed in [`rac_v06_alignment.md`](rac_v06_alignment.md).
+This document sketches the **MCP-native live enforcement** path: RAC at the client/gateway boundary, operating on pending `tools/call` before server side effects. It aligns with the demo layout under `examples/` and the mapper notes in [`authorization_event_mapper.md`](authorization_event_mapper.md). Normative detail remains in the external RAC specification; code locations are indexed in [`implementation_mapping.md`](implementation_mapping.md).
+
+The **paper evaluation (Table IV)** uses the real MCP filesystem demo under `examples/mcp_real_filesystem_v06/`. Run `bash scripts/run_mcp_case_study.sh` to verify committed expected summaries.
 
 ## Objective
 

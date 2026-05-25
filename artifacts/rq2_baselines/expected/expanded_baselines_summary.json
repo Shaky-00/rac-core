@@ -1,0 +1,33 @@
+{
+  "suite": "tracebench_expanded",
+  "description": "RQ2 reference metrics (paper Fig. 4). Regenerate via scripts/run_rq2_tracebench.sh.",
+  "total_workflows": 1248,
+  "oracle_allow_workflows": 240,
+  "oracle_block_workflows": 1008,
+  "missed_block_among_oracle_block": {
+    "FULL_RAC": {
+      "missed_block_count": 0,
+      "missed_block_rate": 0.0
+    },
+    "Static+History": {
+      "missed_block_count": 509,
+      "missed_block_rate": 0.5049603174603176
+    },
+    "HistoryAware": {
+      "missed_block_count": 624,
+      "missed_block_rate": 0.619047619047619
+    },
+    "STATIC_TOOL_ALLOWLIST": {
+      "missed_block_count": 789,
+      "missed_block_rate": 0.7837301587301587
+    },
+    "ENTRY_ONLY": {
+      "missed_block_count": 841,
+      "missed_block_rate": 0.8343253968253967
+    },
+    "NO_RAC": {
+      "missed_block_count": 1008,
+      "missed_block_rate": 1.0
+    }
+  }
+}

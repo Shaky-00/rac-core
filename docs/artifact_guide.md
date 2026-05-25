@@ -6,13 +6,11 @@ This document supplements the root [`README.md`](../README.md) for **artifact ev
 
 - **Python** 3.11+ on Linux or macOS (Windows/WSL2 acceptable).
 - **Sibling checkout:** `rac-core/` and `rac-data/` under the same parent directory.
-- **TraceBench paired suite** installed at `../rac-data/tracebench/paired/` with `controlled_traces/paired/`, or set **`RAC_TRACEBENCH_ROOT`** to the bundle root.
+- **TraceBench paired suite** at `../rac-data/tracebench/paired/` with `controlled_traces/paired/`, or set **`RAC_TRACEBENCH_ROOT`**.
 
 ```bash
 export RAC_DATA_DIR="$(cd .. && pwd)/rac-data"
 ```
-
-If `scripts/check_env.sh` warns about missing TraceBench data, static replay commands will fail until `rac-data` is populated.
 
 ## 1. Environment check
 
@@ -30,58 +28,65 @@ bash scripts/run_tracebench.sh
 
 Runs `scripts/run_tracebench.py` with `--variant-group full` (FULL_RAC, baselines, history-aware variants, RAC_WITHOUT ablations).
 
-**Outputs** (under `artifacts/results/`):
+**Outputs:** `artifacts/results/` (e.g. `tracebench_paired_summary.json`).
 
-- `tracebench_paired_results.csv` / `tracebench_paired_summary.json` (full sweep via `run_tracebench.py`)
-- `tracebench_paired_baselines_{results.csv,summary.json}` or `tracebench_paired_ablations_*` for split runs
-- `tracebench_paired_benign_summary.{json,csv}`
+**Reference:** `artifacts/rq1_tracebench/expected/paired_core_summary.json`
 
-See [`tracebench_result_notes.md`](tracebench_result_notes.md) for field semantics.
+See [`tracebench_result_notes.md`](tracebench_result_notes.md).
 
-**Failures:** missing bundle → set `RAC_DATA_DIR` / `RAC_TRACEBENCH_ROOT`; parse errors → corrupt bundle.
-
-## 3. RQ2 — Baselines vs RAC_WITHOUT ablations
+## 3. RQ2 — Baseline coverage on expanded TraceBench
 
 ```bash
 bash scripts/run_ablation.sh --baselines
 bash scripts/run_ablation.sh --ablations
 ```
 
-Expanded suite (paper-scale): `bash scripts/run_rq2_tracebench.sh` (requires `rac-data/tracebench/` with `controlled_traces/expanded/`).
+Paper-scale expanded suite:
 
-## 4. RQ3 — MCP case study (optional)
+```bash
+bash scripts/run_rq2_tracebench.sh
+```
 
-**Default** — sanity check on committed `examples/mcp_live_enforcement/case_outputs/mcp_case_study_results.json`:
+Requires `rac-data/tracebench/` with `controlled_traces/expanded/` and composite overlay under `tracebench/composite-overlay/`.
+
+**Reference:** `artifacts/rq2_baselines/expected/expanded_baselines_summary.json`
+
+## 4. RQ3 — Real MCP filesystem enforcement (Table IV)
+
+**Default** — sanity check on committed expected summaries:
 
 ```bash
 bash scripts/run_mcp_case_study.sh
 ```
 
-**Live replay** (environment-dependent):
+**Live replay** (Node/npx + MCP filesystem server):
 
 ```bash
 bash scripts/run_mcp_case_study.sh --live
+# or: python3 examples/mcp_real_filesystem_v06/run_real_filesystem_case.py
 ```
 
-**Filesystem MCP demo** — `examples/mcp_real_filesystem_v06/` (may need Node + `RAC_REAL_MCP_SERVER_CMD`); not part of `run_all.sh` by default.
+**Fixtures:** `examples/mcp_real_filesystem_v06/plans/` (14 deterministic planner JSON workflows).
 
 ## 5. RQ4 — Latency
 
-### 5a. Synthetic microbenchmark
+### 5a. Synthetic microbenchmark (quick)
 
 ```bash
 bash scripts/run_latency.sh --quick
 ```
 
-Outputs under `artifacts/results/performance/` (not regression-locked).
+Outputs under `artifacts/results/performance/` (environment-dependent; not regression-locked).
 
-### 5b. TraceBench instrumented overhead
+### 5b. TraceBench instrumented overhead (paper-scale)
 
 Requires expanded TraceBench under `RAC_DATA_DIR`.
 
 ```bash
 bash scripts/run_tracebench_overhead.sh --iterations 100
 ```
+
+**Quick reference only:** `artifacts/rq4_latency/expected/quick_tracebench_overhead_summary.json` (32-trace subset, not full 1248×20 paper run).
 
 ## 6. Aggregate runner
 
@@ -98,14 +103,17 @@ bash scripts/check_artifact.sh
 python3 -m pytest tests/test_artifact_smoke.py tests/test_latency_evaluation.py -q
 ```
 
-Full suite (excluding optional MCP demos): `python3 -m pytest tests -m "not optional" -q`
+Full suite (excluding optional MCP): `python3 -m pytest tests -m "not optional" -q`
 
 ## 8. Reference outputs
 
-`artifacts/expected/summaries/` — small reference JSON. Oracle alignment should match when the TraceBench bundle matches this revision.
+| RQ | Expected summary |
+|----|------------------|
+| RQ1 | `artifacts/rq1_tracebench/expected/paired_core_summary.json` |
+| RQ2 | `artifacts/rq2_baselines/expected/expanded_baselines_summary.json` |
+| RQ3 | `artifacts/rq3_mcp_filesystem/expected/direct_demo_summary.json`, `planner_corpus_summary.json` |
+| RQ4 | `artifacts/rq4_latency/expected/quick_tracebench_overhead_summary.json` |
 
-Deterministic planner JSON under `examples/llm_plans/` — no raw model prompts or provider responses in this artifact.
+Compatibility copies: `artifacts/expected/summaries/`.
 
-## 9. Optional figures
-
-`scripts/paper_optional/` (matplotlib). Inputs from `artifacts/results/` or `artifacts/expected/`; outputs under `artifacts/generated/`.
+Deterministic planner JSON under `examples/llm_plans/` and `examples/mcp_real_filesystem_v06/plans/` — no raw model prompts or provider responses in this artifact.

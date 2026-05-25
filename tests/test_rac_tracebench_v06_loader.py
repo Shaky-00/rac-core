@@ -41,7 +41,7 @@ def _runner() -> TraceRunner:
 def bench_root():
     root = resolve_rac_tracebench_root()
     if root is None:
-        pytest.skip("RAC-TraceBench v0.6 root not found (set RAC_TRACEBENCH_ROOT or place mcp_data next to repo)")
+        pytest.skip("TraceBench root not found (set RAC_TRACEBENCH_ROOT or install rac-data)")
     return root
 
 

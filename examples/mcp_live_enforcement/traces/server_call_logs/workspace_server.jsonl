@@ -1,3 +1,0 @@
-{"timestamp": "2026-05-14T07:08:00.743534+00:00", "server": "workspace_server", "tool_name": "create_internal_report", "arguments": {"metrics_id": "artifact:metrics:artifact:summary:res:report:A"}}
-{"timestamp": "2026-05-14T07:08:00.748890+00:00", "server": "workspace_server", "tool_name": "save_internal_report", "arguments": {"report_id": "artifact:internal_report:artifact:metrics:artifact:summary:res:report:A"}}
-{"timestamp": "2026-05-14T07:08:00.782873+00:00", "server": "workspace_server", "tool_name": "create_internal_report", "arguments": {"summary_id": "artifact:summary:res:report:A"}}

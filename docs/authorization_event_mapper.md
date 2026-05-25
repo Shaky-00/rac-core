@@ -1,6 +1,6 @@
 # Authorization Event Mapper (AEM)
 
-This document describes the **pre-call mapping layer** at the MCP client or gateway boundary: how a pending `tools/call` becomes a **canonical authorization event** consumed by the RAC checker. It supplements the code map in [`design_overview.md`](design_overview.md) and the implementation index in [`rac_v06_alignment.md`](rac_v06_alignment.md); it is **not** a substitute for the external RAC technical specification.
+This document describes the **pre-call mapping layer** at the MCP client or gateway boundary: how a pending `tools/call` becomes a **canonical authorization event** consumed by the RAC checker. It supplements the code map in [`design_overview.md`](design_overview.md) and the implementation index in [`implementation_mapping.md`](implementation_mapping.md); it is **not** a substitute for the external RAC technical specification.
 
 ## Role
 

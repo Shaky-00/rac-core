@@ -4,7 +4,7 @@ This repository implements **Runtime Authorization Consistency (RAC)** as a cont
 
 ## Normative specification
 
-This artifact does not ship the full external RAC technical specification text. Implementation-to-spec mapping and documented gaps are summarized in [`docs/rac_v06_alignment.md`](rac_v06_alignment.md).
+This artifact does not ship the full external RAC technical specification text. Implementation-to-spec mapping and documented gaps are summarized in [`docs/implementation_mapping.md`](implementation_mapping.md).
 
 ## Code map
 

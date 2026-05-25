@@ -34,6 +34,6 @@ python3 scripts/run_tracebench.py
 
 ## Composite overlay
 
-Multi-step composite-drift workflows: `rac-data/tracebench/composite-overlay/` (or legacy `rac-core/data/tracebench_rq2_composite_overlay/` until migrated). Enabled with `--rq2-overlay` on expanded replay scripts.
+Multi-step composite-drift workflows: `rac-data/tracebench/composite-overlay/`. Enabled with `--rq2-overlay` on expanded replay scripts (`scripts/run_rq2_tracebench.sh`).
 
 Installation: [`../data/README.md`](../data/README.md) and [`../../rac-data/README.md`](../../rac-data/README.md).
