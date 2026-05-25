@@ -1,0 +1,5 @@
+# TraceBench paired bundle placeholder
+# Unpack the evaluation bundle here so that
+# controlled_traces/paired/ and oracle_labels/paired_oracle_labels.json exist.
+# The corpus is shipped separately from this rac-core artifact package.
+# See ../README.md.

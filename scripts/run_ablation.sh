@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# RQ2: TraceBench baselines and RAC_WITHOUT ablations (same checker; subset via --variant-group).
+# TraceBench paired suite: baseline or ablation variant subsets (same checker pipeline).
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
@@ -14,4 +14,4 @@ while [[ $# -gt 0 ]]; do
   esac
   shift
 done
-exec python3 "$ROOT/scripts/run_rac_tracebench_v06.py" --output-dir "$ROOT/artifacts/results" --variant-group "$GROUP" "${forward[@]}"
+exec python3 "$ROOT/scripts/run_tracebench.py" --output-dir "$ROOT/artifacts/results" --variant-group "$GROUP" "${forward[@]}"

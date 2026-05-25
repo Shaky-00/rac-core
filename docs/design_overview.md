@@ -1,10 +1,10 @@
 # Design overview (anonymous artifact)
 
-This repository implements **Runtime Authorization Consistency (RAC) v0.6** as a controller-side pre-commit checker over typed authorization events, trusted manifests and grants, causal lineage, and optional structured output anchors for MCP-shaped agentic workflows.
+This repository implements **Runtime Authorization Consistency (RAC)** as a controller-side pre-commit checker over typed authorization events, trusted manifests and grants, causal lineage, and optional structured output anchors for MCP-shaped agentic workflows.
 
 ## Normative specification
 
-This artifact does not ship the full external RAC v0.6 technical specification text. Implementation-to-spec mapping and documented gaps are summarized in [`docs/rac_v06_alignment.md`](rac_v06_alignment.md).
+This artifact does not ship the full external RAC technical specification text. Implementation-to-spec mapping and documented gaps are summarized in [`docs/rac_v06_alignment.md`](rac_v06_alignment.md).
 
 ## Code map
 

@@ -1,8 +1,9 @@
-"""Static Full RAC vs ablation replay for RAC-TraceBench v0.6.
+"""Static Full RAC vs ablation replay for TraceBench paired suite.
 
 Run from repository root, for example:
 
-  export RAC_TRACEBENCH_ROOT=/path/to/rac_tracebench_v06
+  export RAC_DATA_DIR=../rac-data
+  export RAC_TRACEBENCH_ROOT=../rac-data/tracebench/paired   # optional
   python scripts/run_rac_tracebench_v06.py --output-dir artifacts/results
 
 Outputs (default names when --variant-group full):
@@ -29,7 +30,7 @@ from rac_core.validation.rac_tracebench_experiment import (  # noqa: E402
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="RAC-TraceBench v0.6 static replay (FULL_RAC, baselines, ablations)")
+    p = argparse.ArgumentParser(description="TraceBench paired-suite static replay (FULL_RAC, baselines, ablations)")
     p.add_argument(
         "--root",
         type=Path,
@@ -54,9 +55,8 @@ def main() -> None:
     root = resolve_tracebench_root(args.root)
     if root is None:
         print(
-            "ERROR: RAC-TraceBench root not found. Set RAC_TRACEBENCH_ROOT or place the bundle under\n"
-            "  data/tracebench/rac_tracebench_v06/\n"
-            "or mcp_data/rac_tracebench_v06/ next to the repository.\n"
+            "ERROR: TraceBench paired suite not found. Set RAC_TRACEBENCH_ROOT or install under\n"
+            "  RAC_DATA_DIR/tracebench/paired (default ../rac-data/tracebench/paired).\n"
             "Use --root to pass an explicit path.",
             file=sys.stderr,
         )

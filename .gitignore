@@ -14,6 +14,7 @@ artifacts/*.csv
 # Runtime outputs (never commit generated experiment outputs)
 artifacts/results/*
 !artifacts/results/.gitkeep
+artifacts/figures_paper_rq2/*_meta.json
 
 # Optional paper script outputs
 artifacts/generated/*
@@ -25,3 +26,11 @@ artifacts/expected/data/*
 !artifacts/expected/data/rac_tracebench_v06_benign_summary.csv
 !artifacts/expected/data/rac_tracebench_v06_benign_summary.json
 !artifacts/expected/data/mcp_real_filesystem_v06_results.csv
+
+# LLM generation artifacts (replay uses normalized inputs only)
+data/llm_drift_eval/scenarios/generated/
+**/raw_response.json
+**/prompts.json
+**/*api_key*
+**/*secret*
+*.log

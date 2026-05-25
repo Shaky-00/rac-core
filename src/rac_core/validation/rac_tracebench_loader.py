@@ -54,22 +54,24 @@ def _tracebench_manifest_action_defaults(root: Path) -> dict[str, list[str]]:
 
 
 def rac_tracebench_root_candidates() -> list[Path]:
-    env = os.environ.get("RAC_TRACEBENCH_ROOT")
-    out: list[Path] = []
-    if env:
-        out.append(Path(env).expanduser().resolve())
-    repo = Path(__file__).resolve().parents[3]
-    out.append(repo / "data" / "tracebench" / "rac_tracebench_v06")
-    out.append(repo / "mcp_data" / "rac_tracebench_v06")
-    out.append(Path(__file__).resolve().parents[4] / "mcp_data" / "rac_tracebench_v06")
-    return out
+    from rac_core.evaluation.data_paths import tracebench_root_candidates as _candidates
+
+    return _candidates()
 
 
 def resolve_rac_tracebench_root() -> Path | None:
     for p in rac_tracebench_root_candidates():
+        if (p / "controlled_traces" / "core").is_dir():
+            return p
         if (p / "controlled_traces" / "paired").is_dir():
             return p
     return None
+
+
+def is_v1_tracebench_root(root: Path) -> bool:
+    from rac_core.validation.rac_tracebench_v1_adapter import is_v1_bundle_root
+
+    return is_v1_bundle_root(root)
 
 
 def load_trace_case(path: str | Path) -> dict[str, Any]:
@@ -145,12 +147,43 @@ def build_tracebench_grant_templates_root(tracebench_root: str | Path) -> dict[s
     return adapt_tracebench_grant_yaml_root(data)
 
 
-def load_rac_tracebench(root_path: str | Path) -> dict[str, Any]:
+def load_rac_tracebench(
+    root_path: str | Path,
+    *,
+    suite: str = "all",
+    include_mixed: bool = True,
+    include_rq2_overlay: bool = False,
+) -> dict[str, Any]:
     root = Path(root_path).expanduser().resolve()
+    if is_v1_tracebench_root(root):
+        from rac_core.validation.rac_tracebench_v1_adapter import (
+            load_v1_cases_from_dirs,
+            load_v1_oracle_doc,
+        )
+
+        return {
+            "root": root,
+            "benchmark_version": "1.0.0",
+            "suite": suite,
+            "include_mixed": include_mixed,
+            "include_rq2_overlay": include_rq2_overlay,
+            "traces": load_v1_cases_from_dirs(
+                root,
+                suite=suite,
+                include_mixed=include_mixed,
+                include_rq2_overlay=include_rq2_overlay,
+            ),
+            "oracle_labels": load_v1_oracle_doc(
+                root, suite=suite, include_rq2_overlay=include_rq2_overlay
+            ),
+        }
     traces_dir = root / "controlled_traces" / "paired"
     oracle_path = root / "oracle_labels" / "paired_oracle_labels.json"
     return {
         "root": root,
+        "benchmark_version": "0.6",
+        "suite": suite,
+        "include_mixed": include_mixed,
         "traces": load_trace_cases(traces_dir),
         "oracle_labels": load_oracle_labels(oracle_path),
     }
@@ -508,9 +541,8 @@ def convert_trace_case_to_controlled_trace(
     if tpl_list:
         if tb_root is None:
             raise FileNotFoundError(
-                "Cannot build TraceBench initial_basis: set RAC_TRACEBENCH_ROOT or place the bundle under "
-                "data/tracebench/rac_tracebench_v06/ or mcp_data/rac_tracebench_v06/ next to the repository "
-                "so grant templates can be loaded."
+                "Cannot build TraceBench initial_basis: set RAC_TRACEBENCH_ROOT or install grant templates "
+                "under RAC_DATA_DIR (default ../rac-data/tracebench/paired or tracebench/...)."
             )
         gpath = tb_root / "grants" / "sample_grant_templates_v06.yaml"
         grant_templates_path = str(gpath.resolve())

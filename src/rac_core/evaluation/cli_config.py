@@ -80,7 +80,7 @@ def build_latency_eval_config(argv: list[str] | None = None) -> LatencyEvalConfi
         "--output-dir",
         type=Path,
         default=None,
-        help="Directory for latency JSON/CSV (default: <repo>/artifacts/performance).",
+        help="Directory for latency JSON/CSV (default: <repo>/artifacts/results/performance).",
     )
     ns = parser.parse_args(argv)
 

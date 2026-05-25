@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Stage 9A: run latency / overhead benchmarks and write JSON + CSV under artifacts/performance/."""
+"""Stage 9A: run latency / overhead benchmarks and write JSON + CSV.
+
+Default output directory matches ``scripts/run_latency.sh``:
+``<repo>/artifacts/results/performance/``. Override with ``--output-dir``.
+"""
 
 from __future__ import annotations
 
@@ -136,7 +140,7 @@ def main(argv: list[str] | None = None) -> None:
     cfg = build_latency_eval_config(argv)
     out_dir = cfg.output_dir
     if out_dir is None:
-        out_dir = REPO_ROOT / "artifacts" / "performance"
+        out_dir = REPO_ROOT / "artifacts" / "results" / "performance"
     else:
         out_dir = out_dir.expanduser().resolve()
     run_latency_evaluation(cfg, out_dir=out_dir, log=sys.stdout)

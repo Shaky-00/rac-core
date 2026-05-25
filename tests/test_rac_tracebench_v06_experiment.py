@@ -15,7 +15,11 @@ from rac_core.validation.rac_tracebench_experiment import (
     run_trace_variant,
     tracebench_variant_plan,
 )
-from rac_core.validation.rac_tracebench_loader import convert_trace_case_to_controlled_trace, load_rac_tracebench
+from rac_core.validation.rac_tracebench_loader import (
+    convert_trace_case_to_controlled_trace,
+    load_rac_tracebench,
+    rac_tracebench_root_candidates,
+)
 
 
 def test_rac_without_delegation_allows_011_isolation(bench_root) -> None:
@@ -58,10 +62,23 @@ def test_trc_v06_013_full_rac_blocks_multi_not_action(bench_root) -> None:
 
 @pytest.fixture(scope="module")
 def bench_root():
+    """RQ1 core-44 suite: prefer v0.6 paired traces; v1 core-only as fallback."""
+    for p in rac_tracebench_root_candidates():
+        if (p / "controlled_traces" / "paired").is_dir():
+            return p
+    for p in rac_tracebench_root_candidates():
+        if (p / "controlled_traces" / "core").is_dir():
+            return p
     root = resolve_tracebench_root()
     if root is None:
         pytest.skip("RAC-TraceBench v0.6 root not found")
     return root
+
+
+def _rq1_suite_kwargs(root) -> dict:
+    if (root / "controlled_traces" / "paired").is_dir():
+        return {}
+    return {"suite": "core"}
 
 
 def test_tracebench_variant_plan_subset_counts() -> None:
@@ -71,7 +88,7 @@ def test_tracebench_variant_plan_subset_counts() -> None:
 
 
 def test_experiment_writes_csv_and_json(bench_root, tmp_path) -> None:
-    csv_p, json_p = run_and_write(root=bench_root, output_dir=tmp_path)
+    csv_p, json_p = run_and_write(root=bench_root, output_dir=tmp_path, **_rq1_suite_kwargs(bench_root))
     assert csv_p.is_file() and json_p.is_file()
     assert (tmp_path / "rac_tracebench_v06_benign_summary.json").is_file()
     assert (tmp_path / "rac_tracebench_v06_benign_summary.csv").is_file()
@@ -91,7 +108,7 @@ def test_experiment_writes_csv_and_json(bench_root, tmp_path) -> None:
 
 
 def test_full_rac_matches_oracle_all_traces(bench_root) -> None:
-    rows, summary = build_experiment_rows(root=bench_root)
+    rows, summary = build_experiment_rows(root=bench_root, **_rq1_suite_kwargs(bench_root))
     full = [r for r in rows if r["variant"] == "FULL_RAC"]
     assert len(full) == 44
     assert all(r["matched_oracle"] == "true" for r in full)
@@ -104,7 +121,7 @@ def test_full_rac_matches_oracle_all_traces(bench_root) -> None:
 
 
 def test_csv_row_count(bench_root) -> None:
-    rows, _ = build_experiment_rows(root=bench_root)
+    rows, _ = build_experiment_rows(root=bench_root, **_rq1_suite_kwargs(bench_root))
     assert len(rows) == 44 * 13
 
 

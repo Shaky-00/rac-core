@@ -3,7 +3,9 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+export RAC_DATA_DIR="${RAC_DATA_DIR:-$(cd "$ROOT/.." && pwd)/rac-data}"
 echo "== Repository root: $ROOT"
+echo "== RAC_DATA_DIR: $RAC_DATA_DIR"
 python3 <<'PY'
 import os
 import sys
@@ -34,15 +36,18 @@ PY
 
 tb="${RAC_TRACEBENCH_ROOT:-}"
 if [[ -z "$tb" ]]; then
-  for c in "$ROOT/data/tracebench/rac_tracebench_v06" "$ROOT/mcp_data/rac_tracebench_v06" "$(dirname "$ROOT")/mcp_data/rac_tracebench_v06"; do
-    if [[ -d "$c/controlled_traces/paired" ]]; then
+  for c in \
+    "$RAC_DATA_DIR/tracebench/paired" \
+    "$RAC_DATA_DIR/tracebench" \
+    "$ROOT/data/tracebench/paired"; do
+    if [[ -d "$c/controlled_traces/paired" ]] || [[ -d "$c/controlled_traces/core" ]]; then
       tb="$c"
       break
     fi
   done
 fi
-if [[ -n "$tb" ]] && [[ -d "$tb/controlled_traces/paired" ]]; then
-  echo "OK: TraceBench bundle found (set RAC_TRACEBENCH_ROOT to override default discovery)"
+if [[ -n "$tb" ]] && { [[ -d "$tb/controlled_traces/paired" ]] || [[ -d "$tb/controlled_traces/core" ]]; }; then
+  echo "OK: TraceBench data found (override with RAC_TRACEBENCH_ROOT if needed)"
 else
-  echo "WARN: TraceBench bundle not found (set RAC_TRACEBENCH_ROOT or see data/README.md)"
+  echo "WARN: TraceBench data not found (populate $RAC_DATA_DIR/tracebench/ or set RAC_TRACEBENCH_ROOT; see data/README.md)"
 fi

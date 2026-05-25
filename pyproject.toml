@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rac-core"
 version = "0.1.0"
-description = "RAC (Runtime Authorization Consistency) v0.6 prototype core runtime and stores."
+description = "Runtime Authorization Consistency (RAC) prototype for controller-mediated MCP workflows"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.7,<3.0", "mcp>=1.0,<2.0", "PyYAML>=6.0,<7.0"]
