@@ -1,8 +1,10 @@
 # TraceBench JSON format
 
-TraceBench ships in **`rac-data`** under public suite names: **paired**, **core**, **expanded**, and **composite-overlay**.
+TraceBench JSON corpora are **not vendored in `rac-core`**. When an external evaluation bundle is available, layouts use suite names: **paired**, **core**, **expanded**, and **composite-overlay** under `$RAC_DATA_DIR/tracebench/`.
 
-## Unified bundle layout (`rac-data/tracebench/`)
+See [`../data/README.md`](../data/README.md) for `RAC_DATA_DIR` configuration.
+
+## Unified bundle layout (`$RAC_DATA_DIR/tracebench/`)
 
 Typical layout for core and expanded replay:
 
@@ -11,29 +13,27 @@ Typical layout for core and expanded replay:
 - `oracle_labels/core_oracle_labels.json`, `expanded_oracle_labels.json`
 - `grants/`, `manifests/` — replay templates
 
-Set `RAC_TRACEBENCH_ROOT` to the bundle root (or use `RAC_DATA_DIR` discovery). Run:
+Set `RAC_TRACEBENCH_ROOT` to the bundle root (or use `RAC_DATA_DIR` discovery). Example (requires external bundle):
 
 ```bash
-export RAC_DATA_DIR=../rac-data
+export RAC_DATA_DIR=/path/to/rac-data
 python3 scripts/run_rac_tracebench_v1.py --suite core
 python3 scripts/run_rac_tracebench_v1.py --suite expanded --include-mixed false
 ```
 
 The loader normalizes case JSON in [`rac_tracebench_v1_adapter.py`](../src/rac_core/validation/rac_tracebench_v1_adapter.py) before `convert_trace_case_to_controlled_trace`. Core cases use `legacy_trace_id` as replay `trace_id` for regression parity with the paired suite.
 
-## Paired suite layout (`rac-data/tracebench/paired/`)
+## Paired suite layout (`$RAC_DATA_DIR/tracebench/paired/`)
 
 - `controlled_traces/paired/*.json`
 - `oracle_labels/paired_oracle_labels.json`
 
 ```bash
-export RAC_DATA_DIR=../rac-data
-export RAC_TRACEBENCH_ROOT=../rac-data/tracebench/paired   # optional explicit override
+export RAC_DATA_DIR=/path/to/rac-data
+export RAC_TRACEBENCH_ROOT=$RAC_DATA_DIR/tracebench/paired   # optional explicit override
 python3 scripts/run_tracebench.py
 ```
 
 ## Composite overlay
 
-Multi-step composite-drift workflows: `rac-data/tracebench/composite-overlay/`. Enabled with `--rq2-overlay` on expanded replay scripts (`scripts/run_rq2_tracebench.sh`).
-
-Installation: [`../data/README.md`](../data/README.md) and [`../../rac-data/README.md`](../../rac-data/README.md).
+Multi-step composite-drift workflows: `$RAC_DATA_DIR/tracebench/composite-overlay/`. Enabled with `--rq2-overlay` on expanded replay (`scripts/run_rq2_tracebench.sh`).
