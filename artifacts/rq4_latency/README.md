@@ -9,6 +9,6 @@
 **Paper-scale replay (requires `RAC_DATA_DIR`):**
 
 ```bash
-export RAC_DATA_DIR=/path/to/rac-data
+export RAC_DATA_DIR=/path/to/rac-data-review
 bash scripts/run_tracebench_overhead.sh
 ```

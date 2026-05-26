@@ -696,7 +696,7 @@ def run_and_write(
     if r is None:
         raise FileNotFoundError(
             "RAC-TraceBench root not found. Set RAC_TRACEBENCH_ROOT or install suites under "
-            "RAC_DATA_DIR (default ../rac-data/tracebench/paired or tracebench/controlled_traces/...)."
+            "RAC_DATA_DIR (default ../rac-data-review/tracebench/paired or tracebench/controlled_traces/...)."
         )
     out = output_dir or Path("results")
     out = out.expanduser().resolve()

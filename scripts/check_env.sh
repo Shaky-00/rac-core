@@ -3,7 +3,14 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-export RAC_DATA_DIR="${RAC_DATA_DIR:-$(cd "$ROOT/.." && pwd)/rac-data}"
+_PARENT="$(cd "$ROOT/.." && pwd)"
+if [[ -z "${RAC_DATA_DIR:-}" ]]; then
+  if [[ -d "$_PARENT/rac-data-review/tracebench/paired" ]]; then
+    export RAC_DATA_DIR="$_PARENT/rac-data-review"
+  else
+    export RAC_DATA_DIR="$_PARENT/rac-data"
+  fi
+fi
 echo "== Repository root: $ROOT"
 echo "== RAC_DATA_DIR: $RAC_DATA_DIR"
 python3 <<'PY'

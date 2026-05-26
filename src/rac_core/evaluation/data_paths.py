@@ -1,4 +1,4 @@
-"""Resolve external dataset locations for artifact evaluation (rac-data layout)."""
+"""Resolve external dataset locations for artifact evaluation (rac-data-review layout)."""
 
 from __future__ import annotations
 
@@ -14,11 +14,16 @@ def repo_root() -> Path:
 
 
 def rac_data_dir() -> Path:
-    """Dataset repository root (default: sibling ``../rac-data``)."""
+    """Dataset repository root (default: sibling ``../rac-data-review``, else ``../rac-data``)."""
     raw = os.environ.get("RAC_DATA_DIR")
     if raw:
         return Path(raw).expanduser().resolve()
-    return (repo_root().parent / "rac-data").resolve()
+    parent = repo_root().parent
+    for name in ("rac-data-review", "rac-data"):
+        candidate = (parent / name).resolve()
+        if candidate.is_dir():
+            return candidate
+    return (parent / "rac-data-review").resolve()
 
 
 def _suite_layout_ok(root: Path, suite: str) -> bool:

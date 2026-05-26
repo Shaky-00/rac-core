@@ -9,7 +9,7 @@
 **Scripts (require `RAC_DATA_DIR`):**
 
 ```bash
-export RAC_DATA_DIR=/path/to/rac-data
+export RAC_DATA_DIR=/path/to/rac-data-review
 bash scripts/run_tracebench.sh
 # or: python3 scripts/run_tracebench.py
 ```

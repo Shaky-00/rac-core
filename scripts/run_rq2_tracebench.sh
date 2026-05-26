@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
-# RQ2: expanded TraceBench baseline replay (paper-scale; requires rac-data).
+# RQ2: expanded TraceBench baseline replay (paper-scale; requires full data bundle).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-export RAC_DATA_DIR="${RAC_DATA_DIR:-$(cd "$ROOT/.." && pwd)/rac-data}"
+_PARENT="$(cd "$ROOT/.." && pwd)"
+if [[ -z "${RAC_DATA_DIR:-}" ]]; then
+  if [[ -d "$_PARENT/rac-data-review/tracebench/paired" ]]; then
+    export RAC_DATA_DIR="$_PARENT/rac-data-review"
+  else
+    export RAC_DATA_DIR="$_PARENT/rac-data"
+  fi
+fi
 if [[ -z "${RAC_TRACEBENCH_ROOT:-}" ]]; then
   if [[ -d "$RAC_DATA_DIR/tracebench/controlled_traces/core" ]]; then
     export RAC_TRACEBENCH_ROOT="$RAC_DATA_DIR/tracebench"

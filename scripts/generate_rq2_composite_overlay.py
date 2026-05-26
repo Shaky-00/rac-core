@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate multi-step composite-drift overlay cases for RQ2 (stored under rac-core, not mcp_data)."""
+"""Generate multi-step composite-drift overlay cases for RQ2 (stored under rac-core data paths)."""
 
 from __future__ import annotations
 

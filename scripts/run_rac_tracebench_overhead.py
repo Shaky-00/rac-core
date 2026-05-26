@@ -82,7 +82,7 @@ def main() -> None:
     if root is None:
         print(
             "ERROR: TraceBench bundle not found. Set RAC_TRACEBENCH_ROOT or install suites under\n"
-            "  RAC_DATA_DIR (default ../rac-data). Use --root to pass a path.",
+            "  RAC_DATA_DIR (default ../rac-data-review). Use --root to pass a path.",
             file=sys.stderr,
         )
         sys.exit(1)

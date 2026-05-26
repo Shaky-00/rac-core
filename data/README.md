@@ -10,9 +10,15 @@ During blind review, **`rac-core` alone** supports mechanism inspection, `check_
 
 ```text
 parent/
-├── rac-core/     # implementation, tests, scripts (this repository)
-└── rac-data/     # evaluation bundle (not included in this repository)
+├── rac-core/            # implementation, tests, scripts (this repository)
+└── rac-data-review/     # minimal anonymous review bundle (paired TraceBench; not vendored here)
 ```
+
+```bash
+export RAC_DATA_DIR="$(cd ../rac-data-review && pwd)"
+```
+
+If `RAC_DATA_DIR` is unset, rac-core prefers a sibling **`rac-data-review`** directory, then falls back to **`rac-data`** when it contains the same `tracebench/paired/` layout.
 
 Configure the bundle root:
 

@@ -1,4 +1,4 @@
-"""Golden replay tests for RAC-TraceBench v0.6 minimal paired bundle (mcp_data)."""
+"""Golden replay tests for RAC-TraceBench v0.6 minimal paired bundle."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def _runner() -> TraceRunner:
 def bench_root():
     root = resolve_rac_tracebench_root()
     if root is None:
-        pytest.skip("TraceBench root not found (set RAC_TRACEBENCH_ROOT or install rac-data)")
+        pytest.skip("TraceBench root not found (set RAC_TRACEBENCH_ROOT or rac-data-review)")
     return root
 
 

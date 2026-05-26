@@ -17,4 +17,4 @@ Results (default `--output-dir` = `artifacts/results/`):
 
 Sanity check (no live server): `bash scripts/run_mcp_case_study.sh`
 
-Planner fixtures may also be installed under `../rac-data/mcp-replay/filesystem-demo/plans/`.
+Planner fixtures for this artifact are under `examples/mcp_real_filesystem_v06/plans/` in rac-core.

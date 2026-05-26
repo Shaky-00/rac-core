@@ -542,7 +542,7 @@ def convert_trace_case_to_controlled_trace(
         if tb_root is None:
             raise FileNotFoundError(
                 "Cannot build TraceBench initial_basis: set RAC_TRACEBENCH_ROOT or install grant templates "
-                "under RAC_DATA_DIR (default ../rac-data/tracebench/paired or tracebench/...)."
+                "under RAC_DATA_DIR (default ../rac-data-review/tracebench/paired or tracebench/...)."
             )
         gpath = tb_root / "grants" / "sample_grant_templates_v06.yaml"
         grant_templates_path = str(gpath.resolve())

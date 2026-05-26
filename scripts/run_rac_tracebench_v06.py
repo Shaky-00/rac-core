@@ -3,7 +3,7 @@
 Run from repository root, for example:
 
   export RAC_DATA_DIR=../rac-data
-  export RAC_TRACEBENCH_ROOT=../rac-data/tracebench/paired   # optional
+  export RAC_TRACEBENCH_ROOT=../rac-data-review/tracebench/paired   # optional
   python scripts/run_rac_tracebench_v06.py --output-dir artifacts/results
 
 Outputs (default names when --variant-group full):
@@ -56,7 +56,7 @@ def main() -> None:
     if root is None:
         print(
             "ERROR: TraceBench paired suite not found. Set RAC_TRACEBENCH_ROOT or install under\n"
-            "  RAC_DATA_DIR/tracebench/paired (default ../rac-data/tracebench/paired).\n"
+            "  RAC_DATA_DIR/tracebench/paired (default ../rac-data-review/tracebench/paired).\n"
             "Use --root to pass an explicit path.",
             file=sys.stderr,
         )

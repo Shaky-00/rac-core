@@ -4,7 +4,14 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-export RAC_DATA_DIR="${RAC_DATA_DIR:-$(cd "$ROOT/.." && pwd)/rac-data}"
+_PARENT="$(cd "$ROOT/.." && pwd)"
+if [[ -z "${RAC_DATA_DIR:-}" ]]; then
+  if [[ -d "$_PARENT/rac-data-review/tracebench/paired" ]]; then
+    export RAC_DATA_DIR="$_PARENT/rac-data-review"
+  else
+    export RAC_DATA_DIR="$_PARENT/rac-data"
+  fi
+fi
 
 WITH_MCP=0
 LATENCY_ARGS=()
@@ -30,7 +37,7 @@ fi
 if [[ ! -d "${RAC_TRACEBENCH_ROOT:-}/controlled_traces/paired" ]]; then
   echo "ERROR: TraceBench paired suite not found. Set RAC_TRACEBENCH_ROOT or install under:" >&2
   echo "  $RAC_DATA_DIR/tracebench/paired/" >&2
-  echo "See data/README.md and ../rac-data/README.md" >&2
+  echo "See data/README.md and ../rac-data-review/README.md" >&2
   exit 1
 fi
 

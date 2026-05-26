@@ -5,9 +5,9 @@ This document supplements the root [`README.md`](../README.md) for **artifact ev
 ## 0. What this repository provides
 
 - **In-repo:** RAC implementation, tests, replay scripts, committed expected summaries, MCP case-study code and fixtures.
-- **External:** Full TraceBench and expanded evaluation corpora via `RAC_DATA_DIR` (not vendored here). See [`../data/README.md`](../data/README.md).
+- **External (sibling):** Minimal paired bundle via **`rac-data-review`** and `RAC_DATA_DIR`. Full expanded corpora are not in the anonymous submission.
 
-During blind review, start with the **rac-core-only** commands in the README; add `RAC_DATA_DIR` only when you have the separate evaluation bundle.
+During blind review, start with **rac-core-only** commands in the README; clone **`rac-data-review`** alongside for 44-case TraceBench replay.
 
 ## 0.1 Preconditions
 
@@ -32,7 +32,7 @@ Reports import health and whether a TraceBench layout is visible under `RAC_DATA
 **Requires** external paired bundle at `$RAC_DATA_DIR/tracebench/paired/` (or `RAC_TRACEBENCH_ROOT`).
 
 ```bash
-export RAC_DATA_DIR=/path/to/rac-data
+export RAC_DATA_DIR=/path/to/rac-data-review
 bash scripts/run_tracebench.sh
 ```
 
@@ -49,7 +49,7 @@ Runs `scripts/run_tracebench.py` with `--variant-group full` (FULL_RAC, baseline
 **Requires** expanded bundle and composite overlay under `RAC_DATA_DIR` (see [`tracebench_format.md`](tracebench_format.md)).
 
 ```bash
-export RAC_DATA_DIR=/path/to/rac-data
+export RAC_DATA_DIR=/path/to/rac-data-review
 bash scripts/run_ablation.sh --baselines
 bash scripts/run_ablation.sh --ablations
 bash scripts/run_rq2_tracebench.sh
@@ -99,7 +99,7 @@ Synthetic microbenchmarks plus a small instrumented subset. Outputs under `artif
 **Requires** expanded TraceBench under `RAC_DATA_DIR`.
 
 ```bash
-export RAC_DATA_DIR=/path/to/rac-data
+export RAC_DATA_DIR=/path/to/rac-data-review
 bash scripts/run_tracebench_overhead.sh --iterations 100
 ```
 
